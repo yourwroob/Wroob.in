@@ -253,39 +253,174 @@ export type Database = {
         }
         Relationships: []
       }
+      student_culture: {
+        Row: {
+          career_track: string | null
+          created_at: string
+          environment_preference: string | null
+          id: string
+          job_description_text: string | null
+          job_priorities: string[] | null
+          motivation_type: string | null
+          quiet_importance: string | null
+          remote_importance: string | null
+          tech_avoid: string[] | null
+          tech_interests: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          career_track?: string | null
+          created_at?: string
+          environment_preference?: string | null
+          id?: string
+          job_description_text?: string | null
+          job_priorities?: string[] | null
+          motivation_type?: string | null
+          quiet_importance?: string | null
+          remote_importance?: string | null
+          tech_avoid?: string[] | null
+          tech_interests?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          career_track?: string | null
+          created_at?: string
+          environment_preference?: string | null
+          id?: string
+          job_description_text?: string | null
+          job_priorities?: string[] | null
+          motivation_type?: string | null
+          quiet_importance?: string | null
+          remote_importance?: string | null
+          tech_avoid?: string[] | null
+          tech_interests?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_preferences: {
+        Row: {
+          company_size_preferences: Json | null
+          created_at: string
+          currency: string | null
+          desired_salary: number | null
+          id: string
+          job_search_status: string | null
+          job_types: string[] | null
+          needs_sponsorship: boolean | null
+          preferred_locations: string[] | null
+          preferred_roles: string[] | null
+          remote_ok: boolean | null
+          updated_at: string
+          us_authorized: boolean | null
+          user_id: string
+        }
+        Insert: {
+          company_size_preferences?: Json | null
+          created_at?: string
+          currency?: string | null
+          desired_salary?: number | null
+          id?: string
+          job_search_status?: string | null
+          job_types?: string[] | null
+          needs_sponsorship?: boolean | null
+          preferred_locations?: string[] | null
+          preferred_roles?: string[] | null
+          remote_ok?: boolean | null
+          updated_at?: string
+          us_authorized?: boolean | null
+          user_id: string
+        }
+        Update: {
+          company_size_preferences?: Json | null
+          created_at?: string
+          currency?: string | null
+          desired_salary?: number | null
+          id?: string
+          job_search_status?: string | null
+          job_types?: string[] | null
+          needs_sponsorship?: boolean | null
+          preferred_locations?: string[] | null
+          preferred_roles?: string[] | null
+          remote_ok?: boolean | null
+          updated_at?: string
+          us_authorized?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_profiles: {
         Row: {
           created_at: string
+          current_company: string | null
+          current_job_title: string | null
+          experience_years: string | null
           graduation_year: number | null
           id: string
+          is_student: boolean | null
+          linkedin_url: string | null
+          location: string | null
           major: string | null
+          not_employed: boolean | null
+          onboarding_completed_at: string | null
+          onboarding_status: string
+          onboarding_step: number
+          profile_role: string | null
           resume_url: string | null
           skills: string[] | null
           university: string | null
           updated_at: string
           user_id: string
+          website_url: string | null
         }
         Insert: {
           created_at?: string
+          current_company?: string | null
+          current_job_title?: string | null
+          experience_years?: string | null
           graduation_year?: number | null
           id?: string
+          is_student?: boolean | null
+          linkedin_url?: string | null
+          location?: string | null
           major?: string | null
+          not_employed?: boolean | null
+          onboarding_completed_at?: string | null
+          onboarding_status?: string
+          onboarding_step?: number
+          profile_role?: string | null
           resume_url?: string | null
           skills?: string[] | null
           university?: string | null
           updated_at?: string
           user_id: string
+          website_url?: string | null
         }
         Update: {
           created_at?: string
+          current_company?: string | null
+          current_job_title?: string | null
+          experience_years?: string | null
           graduation_year?: number | null
           id?: string
+          is_student?: boolean | null
+          linkedin_url?: string | null
+          location?: string | null
           major?: string | null
+          not_employed?: boolean | null
+          onboarding_completed_at?: string | null
+          onboarding_status?: string
+          onboarding_step?: number
+          profile_role?: string | null
           resume_url?: string | null
           skills?: string[] | null
           university?: string | null
           updated_at?: string
           user_id?: string
+          website_url?: string | null
         }
         Relationships: []
       }
