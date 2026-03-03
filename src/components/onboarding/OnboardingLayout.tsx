@@ -1,0 +1,48 @@
+import { Link } from "react-router-dom";
+import { Briefcase } from "lucide-react";
+import OnboardingStepIndicator from "./OnboardingStepIndicator";
+
+interface OnboardingLayoutProps {
+  currentStep: number;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}
+
+const OnboardingLayout = ({ currentStep, title, subtitle, children }: OnboardingLayoutProps) => {
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Minimal navbar */}
+      <header className="border-b bg-card/80 backdrop-blur-sm">
+        <div className="container flex h-14 items-center">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg brand-gradient">
+              <Briefcase className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-display text-lg font-bold">InternHub</span>
+          </Link>
+        </div>
+      </header>
+
+      <div className="container py-8 sm:py-12">
+        {/* Step indicator */}
+        <OnboardingStepIndicator currentStep={currentStep} />
+
+        {/* Title */}
+        <div className="mx-auto mt-8 max-w-2xl text-center">
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">{title}</h1>
+          {subtitle && (
+            <p className="mt-3 text-muted-foreground">{subtitle}</p>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="mx-auto mt-8 max-w-2xl">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OnboardingLayout;

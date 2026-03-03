@@ -1,0 +1,57 @@
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
+export function useOnboardingStatus() {
+  const { user, role } = useAuth();
+  const [status, setStatus] = useState<string | null>(null);
+  const [step, setStep] = useState<number>(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user || role !== "student") {
+      setLoading(false);
+      return;
+    }
+
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("student_profiles")
+        .select("onboarding_status, onboarding_step")
+        .eq("user_id", user.id)
+        .single();
+
+      if (data) {
+        setStatus((data as any).onboarding_status);
+        setStep((data as any).onboarding_step ?? 1);
+      }
+      setLoading(false);
+    };
+
+    fetch();
+  }, [user, role]);
+
+  const updateStep = async (newStep: number) => {
+    if (!user) return;
+    setStep(newStep);
+    await supabase
+      .from("student_profiles")
+      .update({ onboarding_step: newStep } as any)
+      .eq("user_id", user.id);
+  };
+
+  const completeOnboarding = async () => {
+    if (!user) return;
+    setStatus("completed");
+    await supabase
+      .from("student_profiles")
+      .update({
+        onboarding_status: "completed",
+        onboarding_step: 5,
+        onboarding_completed_at: new Date().toISOString(),
+      } as any)
+      .eq("user_id", user.id);
+  };
+
+  return { status, step, loading, updateStep, completeOnboarding, needsOnboarding: status === "pending" };
+}

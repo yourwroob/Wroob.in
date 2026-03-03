@@ -26,6 +26,11 @@ import Help from "./pages/Help";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
+import OnboardingProfile from "./pages/onboarding/OnboardingProfile";
+import OnboardingPreferences from "./pages/onboarding/OnboardingPreferences";
+import OnboardingCulture from "./pages/onboarding/OnboardingCulture";
+import OnboardingResume from "./pages/onboarding/OnboardingResume";
+import OnboardingDone from "./pages/onboarding/OnboardingDone";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +57,12 @@ const App = () => (
             <Route path="/internships/:id/applicants" element={<ProtectedRoute allowedRoles={["employer"]}><ApplicantReview /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><Admin /></ProtectedRoute>} />
+            {/* Onboarding routes */}
+            <Route path="/onboarding/profile" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingProfile /></ProtectedRoute>} />
+            <Route path="/onboarding/preferences" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingPreferences /></ProtectedRoute>} />
+            <Route path="/onboarding/culture" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingCulture /></ProtectedRoute>} />
+            <Route path="/onboarding/resume" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingResume /></ProtectedRoute>} />
+            <Route path="/onboarding/done" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingDone /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/help" element={<Help />} />
