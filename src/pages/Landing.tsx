@@ -90,7 +90,8 @@ const Landing = () => {
             style={{ scale: heroScale, opacity: heroOpacity }}
           >
             <motion.h1
-              className="font-display text-5xl font-extrabold tracking-tight md:text-7xl lg:text-8xl"
+              className="font-display font-bold tracking-[-0.03em]"
+              style={{ font: "var(--text-hero)", letterSpacing: "var(--letter-spacing-hero)", fontSize: "clamp(36px, 6vw, 68px)" }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
@@ -99,7 +100,8 @@ const Landing = () => {
               <span className="brand-gradient-text">Internship</span>
             </motion.h1>
             <motion.p
-              className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground md:text-xl leading-relaxed"
+              className="mx-auto mt-6 text-muted-foreground"
+              style={{ font: "var(--text-body)", maxWidth: "520px" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
