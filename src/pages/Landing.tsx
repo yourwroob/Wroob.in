@@ -72,7 +72,8 @@ const Landing = () => {
                 transition={{ delay: tag.delay, duration: 0.6 }}
               >
                 <motion.div
-                  className="glass rounded-full px-4 py-2 text-sm text-muted-foreground shadow-sm"
+                  className="glass rounded-full px-4 py-2 text-muted-foreground shadow-sm"
+                  style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 4 + tag.delay, repeat: Infinity, ease: "easeInOut" }}
                   whileHover={{ scale: 1.08, y: -4 }}
@@ -90,7 +91,8 @@ const Landing = () => {
             style={{ scale: heroScale, opacity: heroOpacity }}
           >
             <motion.h1
-              className="font-display text-5xl font-extrabold tracking-tight md:text-7xl lg:text-8xl"
+              className="font-display font-bold tracking-[-0.03em]"
+              style={{ font: "var(--text-hero)", letterSpacing: "var(--letter-spacing-hero)", fontSize: "clamp(36px, 6vw, 68px)" }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
@@ -99,7 +101,8 @@ const Landing = () => {
               <span className="brand-gradient-text">Internship</span>
             </motion.h1>
             <motion.p
-              className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground md:text-xl leading-relaxed"
+              className="mx-auto mt-6 text-muted-foreground"
+              style={{ font: "var(--text-body)", maxWidth: "520px" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
@@ -128,7 +131,7 @@ const Landing = () => {
       >
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-4xl">
+            <h2 style={{ font: "var(--text-section)", letterSpacing: "var(--letter-spacing-heading)" }}>
               Where students and companies connect
             </h2>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -161,8 +164,8 @@ const Landing = () => {
       >
         <div className="container">
           <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="font-display text-3xl font-bold md:text-4xl">How it works</h2>
-            <p className="mt-4 text-muted-foreground">Three simple steps to get started.</p>
+            <h2 style={{ font: "var(--text-section)", letterSpacing: "var(--letter-spacing-heading)" }}>How it works</h2>
+            <p className="mt-4 text-muted-foreground" style={{ font: "var(--text-body)" }}>Three simple steps to get started.</p>
           </div>
           <div className="grid gap-8 md:grid-cols-3">
             {HOW_STEPS.map((step, i) => (
@@ -178,9 +181,9 @@ const Landing = () => {
                 <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl brand-gradient text-white shadow-lg shadow-primary/20">
                   <step.icon className="h-6 w-6" />
                 </div>
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Step {i + 1}</div>
-                <h3 className="font-display text-xl font-semibold">{step.title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                <div className="mb-2 uppercase text-muted-foreground" style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}>Step {i + 1}</div>
+                <h3 style={{ font: "var(--text-card-title)", letterSpacing: "var(--letter-spacing-heading)" }}>{step.title}</h3>
+                <p className="mt-3 text-muted-foreground" style={{ font: "var(--text-body)" }}>{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -211,8 +214,8 @@ const Landing = () => {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.4 }}
                 >
-                  <div className="font-display text-4xl font-bold brand-gradient-text">{stat.value}</div>
-                  <div className="mt-1 text-sm">{stat.label}</div>
+                  <div className="font-bold brand-gradient-text" style={{ font: "var(--text-section)", letterSpacing: "var(--letter-spacing-heading)" }}>{stat.value}</div>
+                  <div className="mt-1" style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}>{stat.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -230,8 +233,8 @@ const Landing = () => {
       >
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-bold md:text-4xl">Ready to get started?</h2>
-            <p className="mt-4 text-lg text-muted-foreground">Join thousands already on InternHub.</p>
+            <h2 style={{ font: "var(--text-section)", letterSpacing: "var(--letter-spacing-heading)" }}>Ready to get started?</h2>
+            <p className="mt-4 text-muted-foreground" style={{ font: "var(--text-body)" }}>Join thousands already on InternHub.</p>
             <div className="mt-8">
               <MagnetizeButton className="animated-border rounded-full">
                 <Button size="lg" className="gap-2 rounded-full h-14 px-10 text-base brand-gradient border-0 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97]" asChild>

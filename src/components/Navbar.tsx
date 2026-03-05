@@ -60,13 +60,13 @@ const Navbar = () => {
     if (!user || !role) {
       return (
         <>
-          <Link to="/internships" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground" : "text-muted-foreground")}>
+          <Link to="/internships" className={cn("transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
             Discover
           </Link>
-          <Link to="/signup?role=student" className={cn("text-sm font-medium transition-colors hover:text-foreground text-muted-foreground")}>
+          <Link to="/signup?role=student" className={cn("transition-colors hover:text-foreground text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
             For Students
           </Link>
-          <Link to="/signup?role=employer" className={cn("text-sm font-medium transition-colors hover:text-foreground text-muted-foreground")}>
+          <Link to="/signup?role=employer" className={cn("transition-colors hover:text-foreground text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
             For Companies
           </Link>
         </>
@@ -75,22 +75,22 @@ const Navbar = () => {
     if (role === "student") {
       return (
         <>
-          <Link to="/internships" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground" : "text-muted-foreground")}>Discover</Link>
-          <Link to="/my-applications" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/my-applications") ? "text-foreground" : "text-muted-foreground")}>My Applications</Link>
+          <Link to="/internships" className={cn("transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Discover</Link>
+          <Link to="/my-applications" className={cn("transition-colors hover:text-foreground", isActive("/my-applications") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Applications</Link>
         </>
       );
     }
     if (role === "employer") {
       return (
         <>
-          <Link to="/my-internships" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/my-internships") ? "text-foreground" : "text-muted-foreground")}>My Internships</Link>
-          <Link to="/post-internship" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/post-internship") ? "text-foreground" : "text-muted-foreground")}>Post Internship</Link>
+          <Link to="/my-internships" className={cn("transition-colors hover:text-foreground", isActive("/my-internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Internships</Link>
+          <Link to="/post-internship" className={cn("transition-colors hover:text-foreground", isActive("/post-internship") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Post Internship</Link>
         </>
       );
     }
     if (role === "admin") {
       return (
-        <Link to="/admin" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/admin") ? "text-foreground" : "text-muted-foreground")}>Admin Panel</Link>
+        <Link to="/admin" className={cn("transition-colors hover:text-foreground", isActive("/admin") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Admin Panel</Link>
       );
     }
     return null;
@@ -107,7 +107,7 @@ const Navbar = () => {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg brand-gradient text-white shadow-md shadow-primary/20">
             <Briefcase className="h-4.5 w-4.5" />
           </div>
-          <span className="font-display text-lg font-bold">InternHub</span>
+          <span className="font-display font-bold" style={{ fontSize: "17px", letterSpacing: "-0.01em" }}>InternHub</span>
         </Link>
 
         {/* Center: Nav links */}
