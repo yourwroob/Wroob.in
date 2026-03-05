@@ -83,8 +83,8 @@ const Navbar = () => {
     if (role === "employer") {
       return (
         <>
-          <Link to="/my-internships" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/my-internships") ? "text-foreground" : "text-muted-foreground")}>My Internships</Link>
-          <Link to="/post-internship" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/post-internship") ? "text-foreground" : "text-muted-foreground")}>Post Internship</Link>
+          <Link to="/my-internships" className={cn("transition-colors hover:text-foreground", isActive("/my-internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Internships</Link>
+          <Link to="/post-internship" className={cn("transition-colors hover:text-foreground", isActive("/post-internship") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Post Internship</Link>
         </>
       );
     }
