@@ -214,8 +214,8 @@ const Landing = () => {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.4 }}
                 >
-                  <div className="font-display text-4xl font-bold brand-gradient-text">{stat.value}</div>
-                  <div className="mt-1 text-sm">{stat.label}</div>
+                  <div className="font-bold brand-gradient-text" style={{ font: "var(--text-section)", letterSpacing: "var(--letter-spacing-heading)" }}>{stat.value}</div>
+                  <div className="mt-1" style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}>{stat.label}</div>
                 </motion.div>
               ))}
             </div>

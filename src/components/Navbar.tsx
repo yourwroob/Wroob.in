@@ -90,7 +90,7 @@ const Navbar = () => {
     }
     if (role === "admin") {
       return (
-        <Link to="/admin" className={cn("text-sm font-medium transition-colors hover:text-foreground", isActive("/admin") ? "text-foreground" : "text-muted-foreground")}>Admin Panel</Link>
+        <Link to="/admin" className={cn("transition-colors hover:text-foreground", isActive("/admin") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Admin Panel</Link>
       );
     }
     return null;
