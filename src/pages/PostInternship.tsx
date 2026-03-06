@@ -24,6 +24,7 @@ const PostInternship = () => {
     title: "", description: "", requirements: "", location: "",
     type: "remote" as "remote" | "onsite" | "hybrid",
     skills_required: [] as string[], deadline: "", industry: "",
+    slots: 5,
   });
 
   useEffect(() => {
