@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
-import { supabase as sb } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const { user, role } = useAuth();
