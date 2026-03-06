@@ -79,6 +79,14 @@ const Navbar = () => {
         <>
           <Link to="/internships" className={cn("transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Discover</Link>
           <Link to="/my-applications" className={cn("transition-colors hover:text-foreground", isActive("/my-applications") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Applications</Link>
+          <Link to="/groups" onClick={markGroupsRead} className={cn("relative transition-colors hover:text-foreground", isActive("/groups") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+            Groups
+            {unreadGroupCount > 0 && (
+              <span className="absolute -right-4 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full brand-gradient text-white text-[9px] font-bold px-1">
+                {unreadGroupCount > 9 ? "9+" : unreadGroupCount}
+              </span>
+            )}
+          </Link>
         </>
       );
     }
