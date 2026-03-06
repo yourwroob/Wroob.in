@@ -111,6 +111,13 @@ const PostInternship = () => {
                 <Input type="date" value={form.deadline} onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))} />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Available Slots *</Label>
+                <Input type="number" min={1} value={form.slots} onChange={(e) => setForm((f) => ({ ...f, slots: parseInt(e.target.value) || 1 }))} placeholder="e.g. 5" />
+                <p className="text-xs text-muted-foreground">Max applications = slots × 2 = {form.slots * 2}</p>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label>Required Skills</Label>
               <div className="flex flex-wrap gap-2 mb-2">
