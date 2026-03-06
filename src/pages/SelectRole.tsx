@@ -20,34 +20,21 @@ const SelectRole = () => {
     setLoading(true);
 
     try {
-      // Insert role
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .insert({ user_id: user.id, role: selected });
+      // Use SECURITY DEFINER function — prevents client-side role manipulation
+      const { error } = await supabase.rpc("set_initial_role", { _role: selected });
 
-      if (roleError && !roleError.message.includes("duplicate")) {
-        throw roleError;
-      }
+      if (error) throw error;
 
-      // Create profile
-      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || "";
-      await supabase.from("profiles").upsert({
-        user_id: user.id,
-        full_name: fullName,
-        avatar_url: user.user_metadata?.avatar_url || null,
-      }, { onConflict: "user_id" });
-
-      // Create role-specific profile
-      if (selected === "student") {
-        await supabase.from("student_profiles").upsert({ user_id: user.id }, { onConflict: "user_id" });
-      } else {
-        await supabase.from("employer_profiles").upsert({ user_id: user.id }, { onConflict: "user_id" });
-      }
-
-      // Navigate to onboarding
-      navigate(selected === "student" ? "/onboarding/profile" : "/employer/onboarding/company", { replace: true });
+      // Force auth context to re-fetch role
+      window.location.href = selected === "student"
+        ? "/onboarding/profile"
+        : "/employer/onboarding/company";
     } catch (err: any) {
-      toast({ title: "Error", description: err.message || "Failed to set role.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message || "Failed to set role.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

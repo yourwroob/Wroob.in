@@ -6,6 +6,50 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Rate limit config: max 10 applications per hour per user
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+async function checkRateLimit(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string
+): Promise<{ allowed: boolean; retryAfterSeconds?: number }> {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+
+  const { data, error } = await supabaseAdmin
+    .from("rate_limits")
+    .select("timestamps")
+    .eq("user_id", userId)
+    .eq("function_name", "apply_to_internship")
+    .maybeSingle();
+
+  const existing: number[] = data?.timestamps ?? [];
+  const recent = existing.filter((ts: number) => ts > windowStart);
+
+  if (recent.length >= RATE_LIMIT_MAX) {
+    const oldest = Math.min(...recent);
+    const retryAfterSeconds = Math.ceil((oldest + RATE_LIMIT_WINDOW_MS - now) / 1000);
+    return { allowed: false, retryAfterSeconds };
+  }
+
+  // Record this request
+  const updated = [...recent, now].slice(-200);
+  await supabaseAdmin
+    .from("rate_limits")
+    .upsert(
+      {
+        user_id: userId,
+        function_name: "apply_to_internship",
+        timestamps: updated,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,function_name" }
+    );
+
+  return { allowed: true };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -42,6 +86,19 @@ Deno.serve(async (req) => {
     }
 
     const userId = claimsData.claims.sub as string;
+
+    // ── Rate Limit Check ──────────────────────────────────────────────────
+    const rateLimitResult = await checkRateLimit(supabaseAdmin, userId);
+    if (!rateLimitResult.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: `Rate limit exceeded. Try again in ${rateLimitResult.retryAfterSeconds} seconds.`,
+          code: "RATE_LIMITED",
+        }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { internship_id, cover_letter } = await req.json();
 
     if (!internship_id) {
@@ -51,7 +108,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Use service role for atomic operations
     // Step 1: Get internship details
     const { data: internship, error: internError } = await supabaseAdmin
       .from("internships")
@@ -100,7 +156,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Step 5: Insert application (using service role to bypass RLS for atomic operation)
+    // Step 5: Insert application
     const { error: insertError } = await supabaseAdmin.from("applications").insert({
       student_id: userId,
       internship_id,
