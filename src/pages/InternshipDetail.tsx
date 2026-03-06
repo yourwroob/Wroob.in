@@ -67,7 +67,14 @@ const InternshipDetail = () => {
       });
 
       if (res.error || res.data?.error) {
-        const msg = res.data?.error || res.error?.message || "Something went wrong";
+        const code = res.data?.code;
+        const msg = code === "RATE_LIMITED"
+          ? "⏳ You're applying too fast. Please wait a moment and try again."
+          : code === "CAPACITY_REACHED"
+          ? "⚠️ Applications are full for this role."
+          : code === "DUPLICATE"
+          ? "You have already applied to this internship."
+          : res.data?.error || res.error?.message || "Something went wrong";
         toast({ title: "Error", description: msg, variant: "destructive" });
       } else {
         setHasApplied(true);
