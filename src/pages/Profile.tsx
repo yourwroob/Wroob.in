@@ -16,6 +16,11 @@ import AvatarUpload from "@/components/AvatarUpload";
 import FollowListDialog from "@/components/FollowListDialog";
 import { useFollows } from "@/hooks/useFollows";
 
+const FollowStats = ({ userId }: { userId: string }) => {
+  const { followerCount, followingCount } = useFollows(userId);
+  return <FollowListDialog userId={userId} followerCount={followerCount} followingCount={followingCount} />;
+};
+
 const Profile = () => {
   const { user, role } = useAuth();
   const { toast } = useToast();
