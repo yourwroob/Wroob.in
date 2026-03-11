@@ -13,6 +13,13 @@ import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
 import AvatarUpload from "@/components/AvatarUpload";
+import FollowListDialog from "@/components/FollowListDialog";
+import { useFollows } from "@/hooks/useFollows";
+
+const FollowStats = ({ userId }: { userId: string }) => {
+  const { followerCount, followingCount } = useFollows(userId);
+  return <FollowListDialog userId={userId} followerCount={followerCount} followingCount={followingCount} />;
+};
 
 const Profile = () => {
   const { user, role } = useAuth();
@@ -109,7 +116,7 @@ const Profile = () => {
           <Card>
             <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              {/* Avatar */}
+              {/* Avatar & Follow Stats */}
               {user && (
                 <div className="flex items-center gap-4">
                   <AvatarUpload
@@ -118,9 +125,12 @@ const Profile = () => {
                     fullName={profile.full_name}
                     onUpload={(url) => setProfile((p) => ({ ...p, avatar_url: url }))}
                   />
-                  <div>
-                    <p className="text-sm font-medium">Profile Photo</p>
-                    <p className="text-xs text-muted-foreground">Click to upload or change</p>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm font-medium">Profile Photo</p>
+                      <p className="text-xs text-muted-foreground">Click to upload or change</p>
+                    </div>
+                    <FollowStats userId={user.id} />
                   </div>
                 </div>
               )}

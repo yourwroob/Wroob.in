@@ -3,8 +3,9 @@ import ReactCrop, { type Crop, centerCrop, makeAspectCrop } from "react-image-cr
 import "react-image-crop/dist/ReactCrop.css";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Camera } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Camera, UserCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -64,9 +65,10 @@ const AvatarUpload = ({ userId, currentUrl, fullName, onUpload }: AvatarUploadPr
   const [imgSrc, setImgSrc] = useState("");
   const [crop, setCrop] = useState<Crop>();
   const [uploading, setUploading] = useState(false);
+  const [showPhotoTip, setShowPhotoTip] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  const handleFileSelect = () => {
+  const openFilePicker = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ACCEPTED.map((t) => `.${t.split("/")[1]}`).join(",");
@@ -85,6 +87,10 @@ const AvatarUpload = ({ userId, currentUrl, fullName, onUpload }: AvatarUploadPr
       reader.readAsDataURL(file);
     };
     input.click();
+  };
+
+  const handleFileSelect = () => {
+    setShowPhotoTip(true);
   };
 
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -162,6 +168,35 @@ const AvatarUpload = ({ userId, currentUrl, fullName, onUpload }: AvatarUploadPr
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showPhotoTip} onOpenChange={setShowPhotoTip}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex justify-center mb-3">
+              <div className="rounded-full bg-primary/10 p-3">
+                <UserCircle className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <AlertDialogTitle className="text-center">Upload a Professional Photo</AlertDialogTitle>
+            <AlertDialogDescription className="text-center space-y-2">
+              <p>
+                Your profile photo is one of the first things employers and fellow students see. Please choose a clear, professional-looking image — similar to what you'd use on LinkedIn.
+              </p>
+              <ul className="text-left text-sm space-y-1 mt-3 list-disc list-inside text-muted-foreground">
+                <li>Use a recent, well-lit headshot</li>
+                <li>Face the camera with a friendly, approachable expression</li>
+                <li>Avoid group photos, selfies with filters, or casual snapshots</li>
+                <li>A plain or uncluttered background works best</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogAction onClick={() => { setShowPhotoTip(false); openFilePicker(); }}>
+              Got it — Choose Photo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
