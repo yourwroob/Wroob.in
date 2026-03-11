@@ -58,7 +58,7 @@ const Landing = () => {
         <div className="absolute inset-0 hero-grid-pattern opacity-[0.03] pointer-events-none" />
 
         {/* Floating tags with parallax */}
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0">
           {FLOATING_TAGS.map((tag, i) => {
             const speed = 0.3 + (i % 4) * 0.15;
             return (
@@ -77,11 +77,11 @@ const Landing = () => {
                 transition={{ delay: tag.delay, duration: 0.8 }}
               >
                 <motion.div
-                  className="glass rounded-full px-4 py-2 text-muted-foreground/70 shadow-sm"
+                  className="glass rounded-full px-4 py-2 text-muted-foreground/70 shadow-sm cursor-pointer transition-shadow duration-300 hover:shadow-2xl hover:shadow-primary/35"
                   style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 4 + tag.delay, repeat: Infinity, ease: "easeInOut" }}
-                  whileHover={{ scale: 1.08, y: -4, opacity: 1 }}
+                  whileHover={{ scale: 1.1, y: -6, opacity: 1 }}
                 >
                   {tag.label}
                 </motion.div>
