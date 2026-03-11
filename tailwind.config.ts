@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "SF Pro Display", "sans-serif"],
-        display: ["Inter", "-apple-system", "BlinkMacSystemFont", "SF Pro Display", "sans-serif"],
+        sans: ["Satoshi", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        display: ["Satoshi", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
