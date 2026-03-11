@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
 import AvatarUpload from "@/components/AvatarUpload";
+import FollowListDialog from "@/components/FollowListDialog";
+import { useFollows } from "@/hooks/useFollows";
 
 const Profile = () => {
   const { user, role } = useAuth();
