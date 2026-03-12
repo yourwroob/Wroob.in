@@ -16,7 +16,7 @@ const About = () => (
       <div className="container">
         <motion.div className="mx-auto max-w-2xl text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl">
-            About <span className="brand-gradient-text">Wroobe</span>
+            About <span className="brand-gradient-text">Wroob</span>
           </h1>
           <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
             Wroobe is a skills-based internship platform connecting ambitious students with innovative companies. We make the hiring process smarter, faster, and fairer for everyone.
