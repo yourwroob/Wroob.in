@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import wroobeLogo from "@/assets/wroobe-logo.png";
+import wroobeLogo from "@/assets/wroob-logo.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,8 +34,8 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link to="/" className="inline-flex items-center gap-2">
-            <img src={wroobeLogo} alt="Wroobe" className="h-10 w-10 rounded-lg" />
-            <span className="font-display text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>Wroobe</span>
+            <img src={wroobeLogo} alt="Wroob" className="h-10 w-10 rounded-lg" />
+            <span className="font-display text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>Wroob</span>
           </Link>
         </div>
         <Card>
