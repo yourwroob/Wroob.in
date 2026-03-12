@@ -107,7 +107,7 @@ const Landing = () => {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
               <span className="text-muted-foreground" style={{ font: "var(--text-label)", letterSpacing: "var(--letter-spacing-label)" }}>
-                Now matching 10,000+ internships
+                Connecting students with early internship opportunities
               </span>
             </motion.div>
 
