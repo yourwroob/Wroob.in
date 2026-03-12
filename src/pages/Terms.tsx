@@ -14,7 +14,7 @@ const Terms = () => (
           <div className="mt-12 space-y-8 text-sm text-muted-foreground leading-relaxed">
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">1. Acceptance of Terms</h2>
-              <p className="mt-2">By accessing or using Wroobe, you agree to be bound by these Terms of Service. If you do not agree, you may not use our platform.</p>
+              <p className="mt-2">By accessing or using Wroob, you agree to be bound by these Terms of Service. If you do not agree, you may not use our platform.</p>
             </section>
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">2. Account Registration</h2>
