@@ -38,7 +38,7 @@ const Terms = () => (
             </section>
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">7. Changes to Terms</h2>
-              <p className="mt-2">We may update these terms from time to time. Continued use of Wroobe after changes constitutes acceptance of the updated terms.</p>
+              <p className="mt-2">We may update these terms from time to time. Continued use of Wroob after changes constitutes acceptance of the updated terms.</p>
             </section>
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">8. Contact</h2>
