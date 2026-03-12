@@ -30,7 +30,7 @@ const Terms = () => (
             </section>
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">5. Limitation of Liability</h2>
-              <p className="mt-2">Wroobe is provided "as is" without warranties. We do not guarantee employment outcomes. Wroobe is not liable for any indirect, incidental, or consequential damages arising from use of the platform.</p>
+              <p className="mt-2">Wroob is provided "as is" without warranties. We do not guarantee employment outcomes. Wroob is not liable for any indirect, incidental, or consequential damages arising from use of the platform.</p>
             </section>
             <section>
               <h2 className="font-display text-lg font-semibold text-foreground">6. Termination</h2>
