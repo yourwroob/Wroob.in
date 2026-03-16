@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Download, Users } from "lucide-react";
+import { CandidateScoreBadge } from "@/components/reputation/ReputationScoreCard";
 
 const statusColors: Record<string, string> = {
   pending: "bg-warning/10 text-warning border-warning/20",
@@ -35,7 +36,7 @@ const ApplicantReview = () => {
 
       const { data: apps } = await supabase
         .from("applications")
-        .select("*, profiles:profiles!applications_student_id_fkey(full_name, avatar_url), student_profiles:student_profiles!applications_student_id_fkey(skills, university, resume_url)")
+        .select("*, profiles:profiles!applications_student_id_fkey(full_name, avatar_url), student_profiles:student_profiles!applications_student_id_fkey(skills, university, resume_url, reputation_score)")
         .eq("internship_id", id!)
         .order("applied_at", { ascending: false });
       setApplicants(apps || []);
@@ -95,6 +96,9 @@ const ApplicantReview = () => {
                               <h3 className="font-semibold">{app.profiles?.full_name || "Unknown"}</h3>
                               {score > 0 && (
                                 <Badge variant={score >= 70 ? "default" : "secondary"}>{score}% match</Badge>
+                              )}
+                              {(app.student_profiles as any)?.reputation_score > 0 && (
+                                <CandidateScoreBadge score={Number((app.student_profiles as any).reputation_score)} />
                               )}
                             </div>
                             {app.student_profiles?.university && (

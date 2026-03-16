@@ -30,6 +30,7 @@ import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import Groups from "./pages/Groups";
 import StudentDiscovery from "./pages/StudentDiscovery";
+import SkillTests from "./pages/SkillTests";
 import OnboardingProfile from "./pages/onboarding/OnboardingProfile";
 import OnboardingCulture from "./pages/onboarding/OnboardingCulture";
 import OnboardingResume from "./pages/onboarding/OnboardingResume";
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/students" element={<ProtectedRoute allowedRoles={["student"]}><StudentDiscovery /></ProtectedRoute>} />
+            <Route path="/skill-tests" element={<ProtectedRoute allowedRoles={["student"]}><SkillTests /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute allowedRoles={["admin"]}><Admin /></ProtectedRoute>} />
             {/* Student onboarding */}
             <Route path="/onboarding/profile" element={<ProtectedRoute allowedRoles={["student"]}><OnboardingProfile /></ProtectedRoute>} />
