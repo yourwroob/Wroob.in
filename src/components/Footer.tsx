@@ -12,7 +12,7 @@ const Footer = () => {
             <div>
               <img src={wroobeLogo} alt="Wroob" className="h-11 rounded-lg invert" />
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-background/50">
+            <p className="mt-3 text-sm leading-relaxed text-background/80">
               Skills-based internship matching for students and companies.
             </p>
             <div className="mt-5 flex items-center gap-3">
@@ -22,7 +22,7 @@ const Footer = () => {
                 { Icon: Linkedin, label: "LinkedIn" },
                 { Icon: Github, label: "GitHub" },
               ].map((item, i) => (
-                <a key={i} href="#" className="text-background/30 transition-colors hover:text-background/70" aria-label={item.label}>
+                <a key={i} href="#" className="text-background/60 transition-colors hover:text-background" aria-label={item.label}>
                   {typeof item.Icon === 'function' && item.Icon.length === 0 && !item.Icon.prototype ? <item.Icon /> : <item.Icon className="h-4 w-4" />}
                 </a>
               ))}
@@ -31,7 +31,7 @@ const Footer = () => {
 
           {/* Explore */}
           <div>
-            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/70">Explore</h4>
+            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/90">Explore</h4>
             <ul className="mt-3 space-y-2.5">
               {[
                 { label: "Browse Internships", href: "/internships" },
@@ -39,7 +39,7 @@ const Footer = () => {
                 { label: "For Companies", href: "/signup?role=employer" },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link to={l.href} className="text-sm text-background/45 transition-colors hover:text-background/80">{l.label}</Link>
+                  <Link to={l.href} className="text-sm text-background/75 transition-colors hover:text-background">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -47,7 +47,7 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/70">Company</h4>
+            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/90">Company</h4>
             <ul className="mt-3 space-y-2.5">
               {[
                 { label: "About", href: "/about" },
@@ -55,7 +55,7 @@ const Footer = () => {
                 { label: "Help Center", href: "/help" },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link to={l.href} className="text-sm text-background/45 transition-colors hover:text-background/80">{l.label}</Link>
+                  <Link to={l.href} className="text-sm text-background/75 transition-colors hover:text-background">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -63,14 +63,14 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/70">Legal</h4>
+            <h4 className="font-display text-xs font-semibold uppercase tracking-wider text-background/90">Legal</h4>
             <ul className="mt-3 space-y-2.5">
               {[
                 { label: "Terms of Service", href: "/terms" },
                 { label: "Privacy Policy", href: "/privacy" },
               ].map((l) => (
                 <li key={l.label}>
-                  <Link to={l.href} className="text-sm text-background/45 transition-colors hover:text-background/80">{l.label}</Link>
+                  <Link to={l.href} className="text-sm text-background/75 transition-colors hover:text-background">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -80,7 +80,7 @@ const Footer = () => {
 
       <div className="border-t border-background/8">
         <div className="container flex items-center justify-between py-5">
-          <p className="text-xs text-background/30">© 2026 Wroob. All rights reserved.</p>
+          <p className="text-xs text-background/60">© 2026 Wroob. All rights reserved.</p>
         </div>
       </div>
     </footer>
