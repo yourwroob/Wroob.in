@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Linkedin, Github } from "lucide-react";
-import wroobeLogo from "@/assets/wroob-logo-clean.png";
+import wroobeLogo from "@/assets/wroob-logo.png";
 
 const Footer = () => {
   return (
@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div>
-              <img src={wroobeLogo} alt="Wroob" className="h-16 brightness-0 invert" />
+              <img src={wroobeLogo} alt="Wroob" className="h-16 rounded-lg bg-white/10 p-1.5" />
             </div>
             <p className="mt-3 text-sm leading-relaxed text-background/80">
               Skills-based internship matching for students and companies.
