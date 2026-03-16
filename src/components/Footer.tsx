@@ -12,7 +12,7 @@ const Footer = () => {
             <div>
               <img src={wroobeLogo} alt="Wroob" className="h-11 rounded-lg invert" />
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-background/50">
+            <p className="mt-3 text-sm leading-relaxed text-background/80">
               Skills-based internship matching for students and companies.
             </p>
             <div className="mt-5 flex items-center gap-3">
