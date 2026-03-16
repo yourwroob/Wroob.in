@@ -23,35 +23,42 @@ export function useReputation(studentId?: string) {
     }
     setLoading(true);
     try {
+      // Use the edge function to get reputation data (works with service role, bypasses type issues)
       const { data: result, error: fnError } = await supabase.functions.invoke("student-reputation", {
-        method: "GET",
-        body: undefined,
-        headers: { "Content-Type": "application/json" },
+        body: { action: "recalculate" },
       });
 
-      // Since invoke doesn't support GET with query params easily, use POST recalculate for own score
-      // or fetch directly from the table
-      const { data: sp, error: dbError } = await supabase
-        .from("student_profiles")
-        .select("reputation_score, completed_internships, skill_test_score, company_feedback_score, profile_strength_score")
-        .eq("user_id", studentId)
-        .single();
+      if (fnError) {
+        // Fallback: query directly with type cast
+        const { data: sp } = await supabase
+          .from("student_profiles")
+          .select("*")
+          .eq("user_id", studentId)
+          .single();
 
-      if (dbError || !sp) {
-        setError("Could not fetch reputation");
-        setLoading(false);
-        return;
+        if (sp) {
+          const raw = sp as any;
+          setData({
+            reputation_score: Number(raw.reputation_score || 0),
+            breakdown: {
+              internship_score: Math.min((raw.completed_internships || 0) * 10, 40),
+              skill_score: Number(raw.skill_test_score || 0),
+              feedback_score: Number(raw.company_feedback_score || 0),
+              profile_score: Number(raw.profile_strength_score || 0),
+            },
+          });
+        }
+      } else if (result) {
+        setData({
+          reputation_score: Number(result.reputation_score || 0),
+          breakdown: {
+            internship_score: Math.min((result.completed_internships || 0) * 10, 40),
+            skill_score: Number(result.skill_test_score || 0),
+            feedback_score: Number(result.company_feedback_score || 0),
+            profile_score: Number(result.profile_strength_score || 0),
+          },
+        });
       }
-
-      setData({
-        reputation_score: Number(sp.reputation_score),
-        breakdown: {
-          internship_score: Math.min((sp.completed_internships || 0) * 10, 40),
-          skill_score: Number(sp.skill_test_score),
-          feedback_score: Number(sp.company_feedback_score),
-          profile_score: Number(sp.profile_strength_score),
-        },
-      });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -65,12 +72,12 @@ export function useReputation(studentId?: string) {
     });
     if (!error && result) {
       setData({
-        reputation_score: Number(result.reputation_score),
+        reputation_score: Number(result.reputation_score || 0),
         breakdown: {
           internship_score: Math.min((result.completed_internships || 0) * 10, 40),
-          skill_score: Number(result.skill_test_score),
-          feedback_score: Number(result.company_feedback_score),
-          profile_score: Number(result.profile_strength_score),
+          skill_score: Number(result.skill_test_score || 0),
+          feedback_score: Number(result.company_feedback_score || 0),
+          profile_score: Number(result.profile_strength_score || 0),
         },
       });
     }
