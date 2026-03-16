@@ -117,6 +117,16 @@ const Profile = () => {
       <Navbar />
       <div className="container max-w-2xl py-10">
         <h1 className="font-display text-3xl font-bold mb-8">My Profile</h1>
+
+        {role === "student" && reputation && (
+          <div className="mb-6">
+            <ReputationScoreCard
+              score={reputation.reputation_score}
+              breakdown={reputation.breakdown}
+            />
+          </div>
+        )}
+
         <div className="space-y-6">
           <Card>
             <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
