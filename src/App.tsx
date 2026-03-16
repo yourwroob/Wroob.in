@@ -30,6 +30,7 @@ import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 import Groups from "./pages/Groups";
 import StudentDiscovery from "./pages/StudentDiscovery";
+import SkillTests from "./pages/SkillTests";
 import OnboardingProfile from "./pages/onboarding/OnboardingProfile";
 import OnboardingCulture from "./pages/onboarding/OnboardingCulture";
 import OnboardingResume from "./pages/onboarding/OnboardingResume";
