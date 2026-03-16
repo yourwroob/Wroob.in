@@ -97,6 +97,9 @@ const ApplicantReview = () => {
                               {score > 0 && (
                                 <Badge variant={score >= 70 ? "default" : "secondary"}>{score}% match</Badge>
                               )}
+                              {(app.student_profiles as any)?.reputation_score > 0 && (
+                                <CandidateScoreBadge score={Number((app.student_profiles as any).reputation_score)} />
+                              )}
                             </div>
                             {app.student_profiles?.university && (
                               <p className="mt-1 text-sm text-muted-foreground">{app.student_profiles.university}</p>
