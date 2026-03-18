@@ -16,15 +16,37 @@ const AdminInternships = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
+    const fetchData = async () => {
+      // Fetch internships and employer profiles separately to avoid FK join issues
+      const { data: internData } = await supabase
         .from("internships")
-        .select("*, employer_profiles!internships_employer_id_fkey(company_name)")
+        .select("*")
         .order("created_at", { ascending: false });
-      setInternships(data || []);
+
+      if (!internData) {
+        setLoading(false);
+        return;
+      }
+
+      const employerIds = [...new Set(internData.map((i) => i.employer_id))];
+      const { data: employers } = await supabase
+        .from("employer_profiles")
+        .select("user_id, company_name")
+        .in("user_id", employerIds);
+
+      const employerMap = new Map(
+        (employers || []).map((e) => [e.user_id, e.company_name])
+      );
+
+      const enriched = internData.map((i) => ({
+        ...i,
+        company_name: employerMap.get(i.employer_id) || "Unknown",
+      }));
+
+      setInternships(enriched);
       setLoading(false);
     };
-    fetch();
+    fetchData();
   }, []);
 
   const updateStatus = async (id: string, status: "draft" | "published" | "closed") => {
@@ -40,7 +62,7 @@ const AdminInternships = () => {
   const filtered = internships.filter(
     (i) =>
       i.title.toLowerCase().includes(search.toLowerCase()) ||
-      (i.employer_profiles?.company_name || "").toLowerCase().includes(search.toLowerCase())
+      (i.company_name || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const statusColor = (s: string) => {
@@ -72,7 +94,7 @@ const AdminInternships = () => {
                     <h4 className="font-medium">{i.title}</h4>
                     <Badge variant={statusColor(i.status)}>{i.status}</Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">{i.employer_profiles?.company_name || "Unknown"} • {i.application_count} applications</p>
+                  <p className="text-sm text-muted-foreground">{i.company_name} • {i.application_count} applications</p>
                 </div>
                 <Select value={i.status} onValueChange={(v: "draft" | "published" | "closed") => updateStatus(i.id, v)}>
                   <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>

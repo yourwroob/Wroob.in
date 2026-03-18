@@ -14,17 +14,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const [{ data: roles }, { data: interns }, { count: appCount }] = await Promise.all([
-        supabase.from("user_roles").select("*"),
-        supabase.from("internships").select("id"),
+      const [{ data: roles }, { count: internCount }, { count: appCount }] = await Promise.all([
+        supabase.from("user_roles").select("role"),
+        supabase.from("internships").select("*", { count: "exact", head: true }),
         supabase.from("applications").select("*", { count: "exact", head: true }),
       ]);
 
       setStats({
-        students: roles?.filter((r: any) => r.role === "student").length || 0,
-        employers: roles?.filter((r: any) => r.role === "employer").length || 0,
-        admins: roles?.filter((r: any) => r.role === "admin").length || 0,
-        totalInternships: interns?.length || 0,
+        students: roles?.filter((r) => r.role === "student").length || 0,
+        employers: roles?.filter((r) => r.role === "employer").length || 0,
+        admins: roles?.filter((r) => r.role === "admin").length || 0,
+        totalInternships: internCount || 0,
         totalApplications: appCount || 0,
       });
       setLoading(false);

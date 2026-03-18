@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const STUDENT_STEP_ROUTES = [
   "/onboarding/profile",
-  "/onboarding/preferences",
+  "/onboarding/culture",
   "/onboarding/culture",
   "/onboarding/resume",
   "/onboarding/done",
