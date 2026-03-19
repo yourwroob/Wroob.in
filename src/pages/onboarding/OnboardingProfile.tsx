@@ -39,6 +39,7 @@ const OnboardingProfile = () => {
   const { updateStep } = useOnboardingStatus();
   const [loading, setLoading] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState({
     location: "",
@@ -80,8 +81,13 @@ const OnboardingProfile = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
-    if (!form.location || !form.profile_role || !form.experience_years) {
-      toast({ title: "Required fields missing", description: "Please fill in location, specialisation, and experience.", variant: "destructive" });
+    const newErrors: Record<string, string> = {};
+    if (!form.location.trim()) newErrors.location = "Location is required.";
+    if (!form.profile_role) newErrors.profile_role = "Specialisation is required.";
+    if (!form.experience_years) newErrors.experience_years = "Experience is required.";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast({ title: "Required fields missing", description: "Please fill in all mandatory fields.", variant: "destructive" });
       return;
     }
     if (form.linkedin_url && !form.linkedin_url.includes("linkedin.com")) {
@@ -132,7 +138,7 @@ const OnboardingProfile = () => {
             <div className="flex gap-2">
               <LocationAutocomplete
                 value={form.location}
-                onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+                onChange={(v) => { setForm((f) => ({ ...f, location: v })); setErrors((e) => ({ ...e, location: "" })); }}
                 className="flex-1"
               />
               <Button
@@ -178,6 +184,7 @@ const OnboardingProfile = () => {
                 {geoLoading ? "Detecting..." : "Detect"}
               </Button>
             </div>
+            {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
           </div>
 
           {/* Course Specialisation */}
@@ -185,7 +192,7 @@ const OnboardingProfile = () => {
             <Label className="font-semibold">
               <span className="text-primary mr-1">*</span>Course Specialisation
             </Label>
-            <Select value={form.profile_role} onValueChange={(v) => setForm((f) => ({ ...f, profile_role: v }))}>
+            <Select value={form.profile_role} onValueChange={(v) => { setForm((f) => ({ ...f, profile_role: v })); setErrors((e) => ({ ...e, profile_role: "" })); }}>
               <SelectTrigger className="w-full sm:w-72">
                 <SelectValue placeholder="Select your specialisation" />
               </SelectTrigger>
@@ -195,6 +202,7 @@ const OnboardingProfile = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.profile_role && <p className="text-sm text-destructive">{errors.profile_role}</p>}
           </div>
 
           {/* Experience in 3-month increments */}
@@ -202,7 +210,7 @@ const OnboardingProfile = () => {
             <Label className="font-semibold">
               <span className="text-primary mr-1">*</span>How many months of experience do you have?
             </Label>
-            <Select value={form.experience_years} onValueChange={(v) => setForm((f) => ({ ...f, experience_years: v }))}>
+            <Select value={form.experience_years} onValueChange={(v) => { setForm((f) => ({ ...f, experience_years: v })); setErrors((e) => ({ ...e, experience_years: "" })); }}>
               <SelectTrigger className="w-full sm:w-72">
                 <SelectValue placeholder="Select months of experience" />
               </SelectTrigger>
@@ -212,6 +220,7 @@ const OnboardingProfile = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.experience_years && <p className="text-sm text-destructive">{errors.experience_years}</p>}
           </div>
 
           {/* Undergrad / PG toggle */}
