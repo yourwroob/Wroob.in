@@ -220,6 +220,7 @@ const OnboardingProfile = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.experience_years && <p className="text-sm text-destructive">{errors.experience_years}</p>}
           </div>
 
           {/* Undergrad / PG toggle */}
