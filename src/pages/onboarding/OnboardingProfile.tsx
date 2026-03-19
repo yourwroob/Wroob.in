@@ -138,7 +138,7 @@ const OnboardingProfile = () => {
             <div className="flex gap-2">
               <LocationAutocomplete
                 value={form.location}
-                onChange={(v) => setForm((f) => ({ ...f, location: v }))}
+                onChange={(v) => { setForm((f) => ({ ...f, location: v })); setErrors((e) => ({ ...e, location: "" })); }}
                 className="flex-1"
               />
               <Button
