@@ -81,8 +81,13 @@ const OnboardingProfile = () => {
 
   const handleSubmit = async () => {
     if (!user) return;
-    if (!form.location || !form.profile_role || !form.experience_years) {
-      toast({ title: "Required fields missing", description: "Please fill in location, specialisation, and experience.", variant: "destructive" });
+    const newErrors: Record<string, string> = {};
+    if (!form.location.trim()) newErrors.location = "Location is required.";
+    if (!form.profile_role) newErrors.profile_role = "Specialisation is required.";
+    if (!form.experience_years) newErrors.experience_years = "Experience is required.";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast({ title: "Required fields missing", description: "Please fill in all mandatory fields.", variant: "destructive" });
       return;
     }
     if (form.linkedin_url && !form.linkedin_url.includes("linkedin.com")) {
