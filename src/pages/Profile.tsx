@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
@@ -16,6 +17,8 @@ import AvatarUpload from "@/components/AvatarUpload";
 import FollowListDialog from "@/components/FollowListDialog";
 import { useFollows } from "@/hooks/useFollows";
 import { ReputationScoreCard } from "@/components/reputation/ReputationScoreCard";
+import { useReputation } from "@/hooks/useReputation";
+import { COURSE_CATEGORIES, SCHOOL_NAMES } from "@/data/courseData";
 import { useReputation } from "@/hooks/useReputation";
 
 const FollowStats = ({ userId }: { userId: string }) => {
