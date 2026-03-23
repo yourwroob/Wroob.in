@@ -282,8 +282,8 @@ const Landing = () => {
           <div className="mx-auto max-w-3xl text-center">
             <div className="flex items-center justify-center gap-8 text-muted-foreground">
               {[
-                { value: "100+", label: "Students Joined" },
-                { value: "20+", label: "Early Companies" },
+                { value: "700+", label: "Students Joined" },
+                { value: "200+", label: "Early Companies" },
                 { value: "150+", label: "Internships Curated" },
               ].map((stat, i) => (
                 <motion.div
