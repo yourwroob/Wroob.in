@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
@@ -17,6 +18,7 @@ import FollowListDialog from "@/components/FollowListDialog";
 import { useFollows } from "@/hooks/useFollows";
 import { ReputationScoreCard } from "@/components/reputation/ReputationScoreCard";
 import { useReputation } from "@/hooks/useReputation";
+import { COURSE_CATEGORIES, SCHOOL_NAMES } from "@/data/courseData";
 
 const FollowStats = ({ userId }: { userId: string }) => {
   const { followerCount, followingCount } = useFollows(userId);
@@ -28,7 +30,7 @@ const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({ full_name: "", bio: "", avatar_url: "" });
-  const [studentProfile, setStudentProfile] = useState({ university: "", major: "", graduation_year: "", skills: [] as string[], resume_url: "" });
+  const [studentProfile, setStudentProfile] = useState({ university: "", major: "", graduation_year: "", skills: [] as string[], resume_url: "", school_category: "", profile_role: "" });
   const [employerProfile, setEmployerProfile] = useState({ company_name: "", industry: "", company_size: "", website: "" });
   const { data: reputation, recalculate: recalcReputation } = useReputation(role === "student" ? user?.id : undefined);
   const [allSkills, setAllSkills] = useState<{ name: string; category: string }[]>([]);
@@ -43,7 +45,11 @@ const Profile = () => {
 
       if (role === "student") {
         const { data: sp } = await supabase.from("student_profiles").select("*").eq("user_id", user.id).maybeSingle();
-        if (sp) setStudentProfile({ university: sp.university || "", major: sp.major || "", graduation_year: sp.graduation_year?.toString() || "", skills: sp.skills || [], resume_url: sp.resume_url || "" });
+        if (sp) {
+          const savedRole = (sp as any).profile_role || "";
+          const derivedCategory = savedRole ? SCHOOL_NAMES.find((s) => COURSE_CATEGORIES[s].includes(savedRole)) || "" : "";
+          setStudentProfile({ university: sp.university || "", major: sp.major || "", graduation_year: sp.graduation_year?.toString() || "", skills: sp.skills || [], resume_url: sp.resume_url || "", school_category: derivedCategory, profile_role: savedRole });
+        }
       } else if (role === "employer") {
         const { data: ep } = await supabase.from("employer_profiles").select("*").eq("user_id", user.id).maybeSingle();
         if (ep) setEmployerProfile({ company_name: ep.company_name || "", industry: ep.industry || "", company_size: ep.company_size || "", website: ep.website || "" });
@@ -71,7 +77,8 @@ const Profile = () => {
         major: studentProfile.major,
         graduation_year: studentProfile.graduation_year ? parseInt(studentProfile.graduation_year) : null,
         skills: studentProfile.skills,
-      }).eq("user_id", user.id);
+        profile_role: studentProfile.profile_role,
+      } as any).eq("user_id", user.id);
     } else if (role === "employer") {
       await supabase.from("employer_profiles").update(employerProfile).eq("user_id", user.id);
     }
@@ -163,6 +170,34 @@ const Profile = () => {
             <Card>
               <CardHeader><CardTitle>Student Details</CardTitle></CardHeader>
               <CardContent className="space-y-4">
+                {/* School / Category */}
+                <div className="space-y-2">
+                  <Label>School / Category</Label>
+                  <Select value={studentProfile.school_category} onValueChange={(v) => setStudentProfile((p) => ({ ...p, school_category: v, profile_role: "" }))}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select your school" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SCHOOL_NAMES.map((s) => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* Course / Programme */}
+                <div className="space-y-2">
+                  <Label>Course / Programme</Label>
+                  <Select value={studentProfile.profile_role} onValueChange={(v) => setStudentProfile((p) => ({ ...p, profile_role: v }))} disabled={!studentProfile.school_category}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={studentProfile.school_category ? "Select your course" : "Select a school first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(COURSE_CATEGORIES[studentProfile.school_category] || []).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>University</Label>
