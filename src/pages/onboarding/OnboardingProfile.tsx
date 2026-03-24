@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { MapPin, Loader2 } from "lucide-react";
 
 import { COURSE_CATEGORIES, SCHOOL_NAMES } from "@/data/courseData";
+import CourseSearchSelect from "@/components/CourseSearchSelect";
 
 const EXPERIENCE_OPTIONS = [
   { value: "0", label: "0 months" },
@@ -211,20 +212,13 @@ const OnboardingProfile = () => {
             <Label className="font-semibold">
               <span className="text-primary mr-1">*</span>Course / Programme
             </Label>
-            <Select
+            <CourseSearchSelect
+              schoolCategory={form.school_category}
               value={form.profile_role}
               onValueChange={(v) => { setForm((f) => ({ ...f, profile_role: v })); setErrors((e) => ({ ...e, profile_role: "" })); }}
               disabled={!form.school_category}
-            >
-              <SelectTrigger className="w-full sm:w-96">
-                <SelectValue placeholder={form.school_category ? "Select your course" : "Select a school first"} />
-              </SelectTrigger>
-              <SelectContent>
-                {(COURSE_CATEGORIES[form.school_category] || []).map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className="sm:w-96"
+            />
             {errors.profile_role && <p className="text-sm text-destructive">{errors.profile_role}</p>}
           </div>
 
