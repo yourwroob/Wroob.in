@@ -7,7 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Users, Briefcase, Pencil } from "lucide-react";
+import { Plus, Users, Briefcase, Pencil, XCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -20,6 +32,7 @@ const MyInternships = () => {
   const navigate = useNavigate();
   const [internships, setInternships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [closingId, setClosingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -34,6 +47,23 @@ const MyInternships = () => {
     };
     fetch();
   }, [user]);
+
+  const handleClose = async (id: string) => {
+    setClosingId(id);
+    const { error } = await supabase
+      .from("internships")
+      .update({ status: "closed" as any })
+      .eq("id", id);
+    setClosingId(null);
+    if (error) {
+      toast.error("Failed to close internship");
+    } else {
+      toast.success("Internship closed successfully");
+      setInternships((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, status: "closed" } : i))
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,6 +107,29 @@ const MyInternships = () => {
                     <Button variant="outline" size="sm" asChild>
                       <Link to={`/internships/${intern.id}/applicants`}>View Applicants</Link>
                     </Button>
+                    {intern.status !== "closed" && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive" size="sm" disabled={closingId === intern.id}>
+                            <XCircle className="h-3.5 w-3.5 mr-1" />Close
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Close this internship?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will stop accepting new applications for <strong>{intern.title}</strong>. Existing applications will not be affected. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleClose(intern.id)}>
+                              Yes, close internship
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </CardContent>
               </Card>
