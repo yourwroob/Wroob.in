@@ -35,6 +35,7 @@ const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Help = lazy(() => import("./pages/Help"));
+const EditInternship = lazy(() => import("./pages/EditInternship"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Groups = lazy(() => import("./pages/Groups"));
@@ -84,6 +85,7 @@ const App = () => (
               <Route path="/my-applications" element={<ProtectedRoute allowedRoles={["student"]}><MyApplications /></ProtectedRoute>} />
               <Route path="/post-internship" element={<ProtectedRoute allowedRoles={["employer"]}><PostInternship /></ProtectedRoute>} />
               <Route path="/my-internships" element={<ProtectedRoute allowedRoles={["employer"]}><MyInternships /></ProtectedRoute>} />
+              <Route path="/internships/:id/edit" element={<ProtectedRoute allowedRoles={["employer"]}><EditInternship /></ProtectedRoute>} />
               <Route path="/internships/:id/applicants" element={<ProtectedRoute allowedRoles={["employer"]}><ApplicantReview /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
               <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />

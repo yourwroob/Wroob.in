@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Users, Briefcase } from "lucide-react";
+import { Plus, Users, Briefcase, Pencil } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -71,6 +71,9 @@ const MyInternships = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to={`/internships/${intern.id}/edit`}><Pencil className="h-3.5 w-3.5 mr-1" />Edit</Link>
+                    </Button>
                     <Button variant="outline" size="sm" asChild>
                       <Link to={`/internships/${intern.id}/applicants`}>View Applicants</Link>
                     </Button>
