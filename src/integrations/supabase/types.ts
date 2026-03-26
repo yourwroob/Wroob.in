@@ -371,56 +371,107 @@ export type Database = {
         Row: {
           app_cap: number
           application_count: number
+          benefits: string[] | null
           created_at: string
+          day_to_day_tasks: string | null
           deadline: string | null
+          department: string | null
           description: string | null
+          duration_months: number | null
+          eligibility: string[] | null
           employer_id: string
           id: string
           industry: string | null
+          internship_category: string | null
+          interview_required: boolean | null
+          joining_process: string | null
           location: string | null
+          projects: string | null
           requirements: string | null
+          resume_screening: boolean | null
+          roles_responsibilities: string | null
           skills_required: string[] | null
           slots: number
+          start_date: string | null
           status: Database["public"]["Enums"]["internship_status"]
+          stipend_amount: number | null
+          stipend_type: string | null
+          test_assignment: string | null
           title: string
           type: Database["public"]["Enums"]["internship_type"]
           updated_at: string
+          working_days: string | null
+          working_hours: string | null
         }
         Insert: {
           app_cap?: number
           application_count?: number
+          benefits?: string[] | null
           created_at?: string
+          day_to_day_tasks?: string | null
           deadline?: string | null
+          department?: string | null
           description?: string | null
+          duration_months?: number | null
+          eligibility?: string[] | null
           employer_id: string
           id?: string
           industry?: string | null
+          internship_category?: string | null
+          interview_required?: boolean | null
+          joining_process?: string | null
           location?: string | null
+          projects?: string | null
           requirements?: string | null
+          resume_screening?: boolean | null
+          roles_responsibilities?: string | null
           skills_required?: string[] | null
           slots?: number
+          start_date?: string | null
           status?: Database["public"]["Enums"]["internship_status"]
+          stipend_amount?: number | null
+          stipend_type?: string | null
+          test_assignment?: string | null
           title: string
           type?: Database["public"]["Enums"]["internship_type"]
           updated_at?: string
+          working_days?: string | null
+          working_hours?: string | null
         }
         Update: {
           app_cap?: number
           application_count?: number
+          benefits?: string[] | null
           created_at?: string
+          day_to_day_tasks?: string | null
           deadline?: string | null
+          department?: string | null
           description?: string | null
+          duration_months?: number | null
+          eligibility?: string[] | null
           employer_id?: string
           id?: string
           industry?: string | null
+          internship_category?: string | null
+          interview_required?: boolean | null
+          joining_process?: string | null
           location?: string | null
+          projects?: string | null
           requirements?: string | null
+          resume_screening?: boolean | null
+          roles_responsibilities?: string | null
           skills_required?: string[] | null
           slots?: number
+          start_date?: string | null
           status?: Database["public"]["Enums"]["internship_status"]
+          stipend_amount?: number | null
+          stipend_type?: string | null
+          test_assignment?: string | null
           title?: string
           type?: Database["public"]["Enums"]["internship_type"]
           updated_at?: string
+          working_days?: string | null
+          working_hours?: string | null
         }
         Relationships: []
       }
