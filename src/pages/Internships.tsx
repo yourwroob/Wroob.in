@@ -204,6 +204,11 @@ const Internships = () => {
                               )}
                             </div>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                              {intern.stipend_amount != null && intern.stipend_amount > 0 && (
+                                <span className="flex items-center gap-1 font-medium text-foreground"><IndianRupee className="h-3 w-3" />₹{intern.stipend_amount.toLocaleString("en-IN")}/mo</span>
+                              )}
+                              {intern.stipend_type === "unpaid" && <span className="text-muted-foreground">Unpaid</span>}
+                              {intern.duration_months && <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{intern.duration_months}mo</span>}
                               {intern.location && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{intern.location}</span>}
                               <span className="flex items-center gap-1 capitalize"><Clock className="h-3 w-3" />{intern.type}</span>
                             </div>
