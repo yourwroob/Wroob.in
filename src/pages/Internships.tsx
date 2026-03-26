@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MapPin, Clock, Building2, Search, Briefcase } from "lucide-react";
+import { MapPin, Clock, Building2, Search, Briefcase, IndianRupee, CalendarDays } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 
@@ -22,6 +24,9 @@ interface Internship {
   industry: string;
   employer_id: string;
   created_at: string;
+  stipend_type: string | null;
+  stipend_amount: number | null;
+  duration_months: number | null;
   employer_profiles?: { company_name: string; logo_url: string } | null;
 }
 
@@ -31,6 +36,8 @@ const Internships = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [stipendRange, setStipendRange] = useState<[number]>([0]);
+  const [durationFilter, setDurationFilter] = useState("all");
   const [studentSkills, setStudentSkills] = useState<string[]>([]);
 
   useEffect(() => {
@@ -61,7 +68,9 @@ const Internships = () => {
     .filter((i) => {
       const matchesSearch = !search || i.title.toLowerCase().includes(search.toLowerCase()) || i.description?.toLowerCase().includes(search.toLowerCase());
       const matchesType = typeFilter === "all" || i.type === typeFilter;
-      return matchesSearch && matchesType;
+      const matchesStipend = stipendRange[0] === 0 || (i.stipend_amount != null && i.stipend_amount >= stipendRange[0]);
+      const matchesDuration = durationFilter === "all" || (i.duration_months != null && String(i.duration_months) === durationFilter);
+      return matchesSearch && matchesType && matchesStipend && matchesDuration;
     })
     .sort((a, b) => {
       if (studentSkills.length) return calcMatchScore(b.skills_required) - calcMatchScore(a.skills_required);
@@ -96,6 +105,45 @@ const Internships = () => {
                     <SelectItem value="hybrid">Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {/* Stipend filter */}
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-1.5 text-sm">
+                    <IndianRupee className="h-3.5 w-3.5" />
+                    Min Stipend: {stipendRange[0] === 0 ? "Any" : `₹${stipendRange[0].toLocaleString("en-IN")}/mo`}
+                  </Label>
+                  <Slider
+                    value={stipendRange}
+                    onValueChange={(v) => setStipendRange(v as [number])}
+                    min={0}
+                    max={50000}
+                    step={1000}
+                    className="py-1"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Any</span>
+                    <span>₹50k</span>
+                  </div>
+                </div>
+
+                {/* Duration filter */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1.5 text-sm">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    Duration
+                  </Label>
+                  <Select value={durationFilter} onValueChange={setDurationFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Durations</SelectItem>
+                      {[1, 2, 3, 4, 5, 6, 9, 12].map((m) => (
+                        <SelectItem key={m} value={String(m)}>{m} month{m > 1 ? "s" : ""}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </aside>
