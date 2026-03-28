@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
+import LoginGreeting from "@/components/LoginGreeting";
 import { lazy, Suspense } from "react";
 
 // Eagerly loaded (landing/auth - first paint)
@@ -71,6 +72,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <SessionTimeoutWarning />
+          <LoginGreeting />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Landing />} />
