@@ -127,13 +127,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+    if (mountedRef.current) {
+      setProfile(profileData ?? null);
+    }
+  }, [user]);
+
   const updatePassword = async (password: string) => {
     const { error } = await supabase.auth.updateUser({ password });
     return { error };
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, profile, loading, signUp, signIn, signOut, resetPassword, updatePassword }}>
+    <AuthContext.Provider value={{ user, session, role, profile, loading, refreshProfile, signUp, signIn, signOut, resetPassword, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );
