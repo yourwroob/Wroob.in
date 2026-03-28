@@ -10,6 +10,7 @@ interface AuthContextType {
   role: AppRole | null;
   profile: any | null;
   loading: boolean;
+  refreshProfile: () => Promise<void>;
   signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
