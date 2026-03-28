@@ -25,6 +25,7 @@ const Login = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      sessionStorage.setItem("wroob_just_logged_in", "true");
       navigate("/dashboard");
     }
   };
