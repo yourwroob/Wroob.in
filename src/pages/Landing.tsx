@@ -10,14 +10,14 @@ import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const FLOATING_TAGS = [
-  { label: "Frontend", top: "12%", left: "8%", delay: 0, scale: 1.02, showOnMobile: true },
-  { label: "AI / ML", top: "18%", right: "12%", delay: 0.5, scale: 0.97, showOnMobile: true },
+  { label: "Frontend", top: "10%", left: "4%", delay: 0, scale: 1.02, showOnMobile: true },
+  { label: "AI / ML", top: "15%", right: "4%", delay: 0.5, scale: 0.97, showOnMobile: true },
   { label: "Remote", top: "35%", left: "5%", delay: 1.2, scale: 1.0, showOnMobile: false },
-  { label: "React", bottom: "28%", left: "12%", delay: 0.8, scale: 1.04, showOnMobile: true },
+  { label: "React", bottom: "20%", left: "4%", delay: 0.8, scale: 1.04, showOnMobile: true },
   { label: "Fintech", top: "8%", left: "32%", delay: 1.5, scale: 0.96, showOnMobile: false },
   { label: "Web3", bottom: "18%", right: "8%", delay: 0.3, scale: 1.01, showOnMobile: false },
-  { label: "Data Science", top: "42%", right: "6%", delay: 1.8, scale: 0.98, showOnMobile: true },
-  { label: "Python", bottom: "35%", right: "15%", delay: 0.7, scale: 1.03, showOnMobile: true },
+  { label: "Data Science", bottom: "30%", right: "2%", delay: 1.8, scale: 0.98, showOnMobile: true },
+  { label: "Python", bottom: "12%", right: "4%", delay: 0.7, scale: 1.03, showOnMobile: true },
   { label: "UI/UX", bottom: "12%", left: "25%", delay: 1.1, scale: 0.99, showOnMobile: false },
   { label: "Backend", top: "6%", right: "30%", delay: 1.4, scale: 1.0, showOnMobile: true },
   { label: "Marketing", bottom: "22%", left: "3%", delay: 2.0, scale: 1.02, showOnMobile: false },
