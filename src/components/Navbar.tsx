@@ -59,17 +59,23 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const navLinkClass = (path: string) =>
+    cn(
+      "transition-colors duration-200 hover:text-[hsl(var(--nav-hover))] focus-visible:text-[hsl(var(--nav-hover))] focus-visible:outline-none",
+      isActive(path) ? "text-foreground" : "text-muted-foreground"
+    );
+
   const centerLinks = () => {
     if (!user || !role) {
       return (
         <>
-          <Link to="/internships" className={cn("transition-colors hover:text-foreground font-medium", isActive("/internships") ? "text-foreground" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+          <Link to="/internships" className={navLinkClass("/internships")} style={{ font: "var(--text-nav)" }}>
             Discover
           </Link>
-          <Link to="/signup?role=student" className={cn("transition-colors hover:text-foreground font-medium text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+          <Link to="/signup?role=student" className={navLinkClass("/signup?role=student")} style={{ font: "var(--text-nav)" }}>
             For Students
           </Link>
-          <Link to="/signup?role=employer" className={cn("transition-colors hover:text-foreground font-medium text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+          <Link to="/signup?role=employer" className={navLinkClass("/signup?role=employer")} style={{ font: "var(--text-nav)" }}>
             For Companies
           </Link>
         </>
@@ -78,12 +84,12 @@ const Navbar = () => {
     if (role === "student") {
       return (
         <>
-          <Link to="/internships" className={cn("transition-colors hover:text-foreground", isActive("/internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Discover</Link>
-          <Link to="/my-applications" className={cn("transition-colors hover:text-foreground", isActive("/my-applications") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Applications</Link>
-          <Link to="/students" className={cn("transition-colors hover:text-foreground", isActive("/students") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Students</Link>
-          <Link to="/skill-tests" className={cn("transition-colors hover:text-foreground", isActive("/skill-tests") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Skill Tests</Link>
-          <Link to="/campus" className={cn("transition-colors hover:text-foreground", isActive("/campus") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Campus</Link>
-          <Link to="/groups" onClick={markGroupsRead} className={cn("relative transition-colors hover:text-foreground", isActive("/groups") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+          <Link to="/internships" className={navLinkClass("/internships")} style={{ font: "var(--text-nav)" }}>Discover</Link>
+          <Link to="/my-applications" className={navLinkClass("/my-applications")} style={{ font: "var(--text-nav)" }}>My Applications</Link>
+          <Link to="/students" className={navLinkClass("/students")} style={{ font: "var(--text-nav)" }}>Students</Link>
+          <Link to="/skill-tests" className={navLinkClass("/skill-tests")} style={{ font: "var(--text-nav)" }}>Skill Tests</Link>
+          <Link to="/campus" className={navLinkClass("/campus")} style={{ font: "var(--text-nav)" }}>Campus</Link>
+          <Link to="/groups" onClick={markGroupsRead} className={cn("relative", navLinkClass("/groups"))} style={{ font: "var(--text-nav)" }}>
             Groups
             {unreadGroupCount > 0 && (
               <span className="absolute -right-4 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full brand-gradient text-white text-[9px] font-bold px-1">
@@ -97,9 +103,9 @@ const Navbar = () => {
     if (role === "employer") {
       return (
         <>
-          <Link to="/my-internships" className={cn("transition-colors hover:text-foreground", isActive("/my-internships") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>My Internships</Link>
-          <Link to="/post-internship" className={cn("transition-colors hover:text-foreground", isActive("/post-internship") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Post Internship</Link>
-          <Link to="/groups" onClick={markGroupsRead} className={cn("relative transition-colors hover:text-foreground", isActive("/groups") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>
+          <Link to="/my-internships" className={navLinkClass("/my-internships")} style={{ font: "var(--text-nav)" }}>My Internships</Link>
+          <Link to="/post-internship" className={navLinkClass("/post-internship")} style={{ font: "var(--text-nav)" }}>Post Internship</Link>
+          <Link to="/groups" onClick={markGroupsRead} className={cn("relative", navLinkClass("/groups"))} style={{ font: "var(--text-nav)" }}>
             Groups
             {unreadGroupCount > 0 && (
               <span className="absolute -right-4 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full brand-gradient text-white text-[9px] font-bold px-1">
@@ -112,7 +118,7 @@ const Navbar = () => {
     }
     if (role === "admin") {
       return (
-        <Link to="/admin" className={cn("transition-colors hover:text-foreground", isActive("/admin") ? "text-foreground font-medium" : "text-muted-foreground")} style={{ font: "var(--text-nav)" }}>Admin Panel</Link>
+        <Link to="/admin" className={navLinkClass("/admin")} style={{ font: "var(--text-nav)" }}>Admin Panel</Link>
       );
     }
     return null;

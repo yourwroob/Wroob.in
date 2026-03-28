@@ -12,7 +12,8 @@
     --text-body: 400 15px/1.6 var(--font-primary);
     --text-label: 500 12px/1 var(--font-primary);
     --text-button: 500 14px/1 var(--font-primary);
-    --text-nav: 400 15px/1 var(--font-primary);
+    --text-nav: 700 15px/1 var(--font-primary);
+    --nav-hover: 228 68% 51%;
 
     --letter-spacing-hero: -0.03em;
     --letter-spacing-heading: -0.02em;
