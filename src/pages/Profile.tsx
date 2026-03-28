@@ -31,7 +31,7 @@ const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState({ full_name: "", bio: "", avatar_url: "" });
-  const [studentProfile, setStudentProfile] = useState({ university: "", major: "", graduation_year: "", skills: [] as string[], resume_url: "", school_category: "", profile_role: "" });
+  const [studentProfile, setStudentProfile] = useState({ university: "", skills: [] as string[], resume_url: "", school_category: "", profile_role: "", phone_number: "" });
   const [employerProfile, setEmployerProfile] = useState({ company_name: "", industry: "", company_size: "", website: "" });
   const { data: reputation, recalculate: recalcReputation } = useReputation(role === "student" ? user?.id : undefined);
   const [allSkills, setAllSkills] = useState<{ name: string; category: string }[]>([]);
@@ -56,7 +56,7 @@ const Profile = () => {
         if (sp) {
           const savedRole = (sp as any).profile_role || "";
           const derivedCategory = savedRole ? SCHOOL_NAMES.find((s) => COURSE_CATEGORIES[s].includes(savedRole)) || "" : "";
-          setStudentProfile({ university: sp.university || "", major: sp.major || "", graduation_year: sp.graduation_year?.toString() || "", skills: sp.skills || [], resume_url: sp.resume_url || "", school_category: derivedCategory, profile_role: savedRole });
+          setStudentProfile({ university: sp.university || "", skills: sp.skills || [], resume_url: sp.resume_url || "", school_category: derivedCategory, profile_role: savedRole, phone_number: (sp as any).phone_number || "" });
         }
       } else if (role === "employer") {
         const { data: ep } = await supabase.from("employer_profiles").select("*").eq("user_id", user.id).maybeSingle();
@@ -82,10 +82,9 @@ const Profile = () => {
     if (role === "student") {
       await supabase.from("student_profiles").update({
         university: studentProfile.university,
-        major: studentProfile.major,
-        graduation_year: studentProfile.graduation_year ? parseInt(studentProfile.graduation_year) : null,
         skills: studentProfile.skills,
         profile_role: studentProfile.profile_role,
+        phone_number: studentProfile.phone_number || null,
       } as any).eq("user_id", user.id);
     } else if (role === "employer") {
       await supabase.from("employer_profiles").update(employerProfile).eq("user_id", user.id);
@@ -171,6 +170,11 @@ const Profile = () => {
                 <Input value={profile.full_name} onChange={(e) => setProfile((p) => ({ ...p, full_name: e.target.value }))} />
               </div>
               <div className="space-y-2">
+                <Label>Email</Label>
+                <Input value={user?.email || ""} disabled className="bg-muted cursor-not-allowed" />
+                <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+              </div>
+              <div className="space-y-2">
                 <Label>Bio</Label>
                 <Textarea value={profile.bio} onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))} placeholder="Tell us about yourself..." />
               </div>
@@ -205,22 +209,33 @@ const Profile = () => {
                     disabled={!studentProfile.school_category}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>University</Label>
-                    <Input value={studentProfile.university} onChange={(e) => setStudentProfile((p) => ({ ...p, university: e.target.value }))} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Major</Label>
-                    <Input value={studentProfile.major} onChange={(e) => setStudentProfile((p) => ({ ...p, major: e.target.value }))} />
-                  </div>
+                <div className="space-y-2">
+                  <Label>Your College or University</Label>
+                  <Input value={studentProfile.university} onChange={(e) => setStudentProfile((p) => ({ ...p, university: e.target.value }))} placeholder="e.g., IIT Delhi" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Graduation Year</Label>
-                  <Input type="number" value={studentProfile.graduation_year} onChange={(e) => setStudentProfile((p) => ({ ...p, graduation_year: e.target.value }))} />
+                  <Label>Phone Number</Label>
+                  <div className="flex gap-2">
+                    <div className="flex items-center justify-center rounded-md border border-input bg-muted px-3 text-sm font-medium text-muted-foreground">+91</div>
+                    <Input
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="Enter 10-digit phone number"
+                      value={studentProfile.phone_number}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        setStudentProfile((p) => ({ ...p, phone_number: v }));
+                      }}
+                      className="flex-1"
+                    />
+                  </div>
+                  {studentProfile.phone_number && studentProfile.phone_number.length > 0 && studentProfile.phone_number.length !== 10 && (
+                    <p className="text-xs text-destructive">Phone number must be exactly 10 digits</p>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <Label>Skills</Label>
+                  <Label>What skills do you currently have?</Label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {studentProfile.skills.map((s) => (
                       <Badge key={s} variant="secondary" className="gap-1">
