@@ -49,6 +49,7 @@ const OnboardingProfile = () => {
     not_employed: false,
     linkedin_url: "",
     website_url: "",
+    phone_number: "",
   });
 
   useEffect(() => {
@@ -77,6 +78,7 @@ const OnboardingProfile = () => {
             not_employed: d.not_employed ?? false,
             linkedin_url: d.linkedin_url || "",
             website_url: d.website_url || "",
+            phone_number: d.phone_number || "",
           }));
         }
       });
@@ -88,6 +90,7 @@ const OnboardingProfile = () => {
     if (!form.location.trim()) newErrors.location = "Location is required.";
     if (!form.profile_role) newErrors.profile_role = "Specialisation is required.";
     if (!form.experience_years) newErrors.experience_years = "Experience is required.";
+    if (form.phone_number && form.phone_number.length !== 10) newErrors.phone_number = "Phone number must be exactly 10 digits.";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       toast({ title: "Required fields missing", description: "Please fill in all mandatory fields.", variant: "destructive" });
@@ -111,6 +114,7 @@ const OnboardingProfile = () => {
         not_employed: form.not_employed,
         linkedin_url: form.linkedin_url,
         website_url: form.website_url,
+        phone_number: form.phone_number || null,
         onboarding_step: 2,
       } as any)
       .eq("user_id", user.id);
@@ -132,6 +136,13 @@ const OnboardingProfile = () => {
     >
       <Card>
         <CardContent className="space-y-6 p-6 sm:p-8">
+          {/* Email (read-only) */}
+          <div className="space-y-2">
+            <Label className="font-semibold">Email</Label>
+            <Input value={user?.email || ""} disabled className="bg-muted cursor-not-allowed" />
+            <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+          </div>
+
           {/* Location */}
           <div className="space-y-2">
             <Label className="font-semibold">
@@ -298,6 +309,27 @@ const OnboardingProfile = () => {
                 <Label htmlFor="not-employed" className="text-sm whitespace-nowrap">I'm not currently employed</Label>
               </div>
             </div>
+          </div>
+
+          {/* Phone Number */}
+          <div className="space-y-2">
+            <Label className="font-semibold">Phone Number</Label>
+            <div className="flex gap-2">
+              <div className="flex items-center justify-center rounded-md border border-input bg-muted px-3 text-sm font-medium text-muted-foreground">+91</div>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                placeholder="Enter 10-digit phone number"
+                value={form.phone_number}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setForm((f) => ({ ...f, phone_number: v }));
+                }}
+                className="flex-1 sm:w-72"
+              />
+            </div>
+            {errors.phone_number && <p className="text-sm text-destructive">{errors.phone_number}</p>}
           </div>
 
           {/* LinkedIn & Website */}
