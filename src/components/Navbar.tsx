@@ -86,9 +86,9 @@ const Navbar = () => {
         <>
           <Link to="/internships" className={navLinkClass("/internships")} style={{ font: "var(--text-nav)" }}>Discover</Link>
           <Link to="/my-applications" className={navLinkClass("/my-applications")} style={{ font: "var(--text-nav)" }}>My Applications</Link>
-          <Link to="/students" className={navLinkClass("/students")} style={{ font: "var(--text-nav)" }}>Students</Link>
+          <Link to="/students" className={navLinkClass("/students")} style={{ font: "var(--text-nav)" }}>LinkUp</Link>
           <Link to="/skill-tests" className={navLinkClass("/skill-tests")} style={{ font: "var(--text-nav)" }}>Skill Tests</Link>
-          <Link to="/campus" className={navLinkClass("/campus")} style={{ font: "var(--text-nav)" }}>Campus</Link>
+          <Link to="/campus" className={navLinkClass("/campus")} style={{ font: "var(--text-nav)" }}>PeerUp</Link>
           <Link to="/groups" onClick={markGroupsRead} className={cn("relative", navLinkClass("/groups"))} style={{ font: "var(--text-nav)" }}>
             Groups
             {unreadGroupCount > 0 && (
