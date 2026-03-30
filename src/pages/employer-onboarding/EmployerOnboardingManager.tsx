@@ -1,14 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmployerOnboardingStatus } from "@/hooks/useEmployerOnboardingStatus";
+import { useEmployerDraft } from "@/hooks/useEmployerDraft";
 import EmployerOnboardingLayout from "@/components/onboarding/EmployerOnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ShieldAlert } from "lucide-react";
+
+const DB_FIELDS = [
+  "manager_contact_name", "manager_designation", "manager_email", "manager_phone",
+] as const;
 
 const EmployerOnboardingManager = () => {
   const { user } = useAuth();
@@ -17,33 +22,16 @@ const EmployerOnboardingManager = () => {
   const { updateStep } = useEmployerOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    manager_contact_name: "",
-    manager_designation: "",
-    manager_email: "",
-    manager_phone: "",
-  });
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("employer_profiles")
-      .select("manager_contact_name, manager_designation, manager_email, manager_phone")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data) {
-          setForm({
-            manager_contact_name: data.manager_contact_name || "",
-            manager_designation: data.manager_designation || "",
-            manager_email: data.manager_email || "",
-            manager_phone: data.manager_phone || "",
-          });
-        }
-      });
-  }, [user]);
-
-  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+  const { form, update, clearDraft, saveNow } = useEmployerDraft(
+    "manager",
+    [...DB_FIELDS],
+    {
+      manager_contact_name: "",
+      manager_designation: "",
+      manager_email: "",
+      manager_phone: "",
+    }
+  );
 
   const handleContinue = async () => {
     if (!user) return;
@@ -80,6 +68,7 @@ const EmployerOnboardingManager = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(4);
       navigate("/employer/onboarding/legal");
     }
@@ -103,17 +92,17 @@ const EmployerOnboardingManager = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Contact Person Name *</Label>
-            <Input value={form.manager_contact_name} onChange={(e) => update("manager_contact_name", e.target.value)} placeholder="Full name" />
+            <Input value={form.manager_contact_name} onChange={(e) => update("manager_contact_name", e.target.value)} onBlur={saveNow} placeholder="Full name" />
           </div>
           <div className="space-y-2">
             <Label>Designation</Label>
-            <Input value={form.manager_designation} onChange={(e) => update("manager_designation", e.target.value)} placeholder="e.g. CEO, Director" />
+            <Input value={form.manager_designation} onChange={(e) => update("manager_designation", e.target.value)} onBlur={saveNow} placeholder="e.g. CEO, Director" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Official Email *</Label>
-            <Input type="email" value={form.manager_email} onChange={(e) => update("manager_email", e.target.value)} placeholder="manager@company.com" />
+            <Input type="email" value={form.manager_email} onChange={(e) => update("manager_email", e.target.value)} onBlur={saveNow} placeholder="manager@company.com" />
           </div>
           <div className="space-y-2">
             <Label>Phone Number *</Label>
@@ -126,6 +115,7 @@ const EmployerOnboardingManager = () => {
                 placeholder="Enter 10-digit phone number"
                 value={form.manager_phone}
                 onChange={(e) => update("manager_phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                onBlur={saveNow}
                 className="flex-1"
               />
             </div>

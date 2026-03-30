@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmployerOnboardingStatus } from "@/hooks/useEmployerOnboardingStatus";
+import { useEmployerDraft } from "@/hooks/useEmployerDraft";
 import EmployerOnboardingLayout from "@/components/onboarding/EmployerOnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-
 
 const INDUSTRY_TYPES = [
   "Manufacturing & Production",
@@ -38,6 +38,11 @@ const COMPANY_SIZES = [
   "1-10", "11-50", "51-200", "201-500", "501-1000", "1000+",
 ];
 
+const DB_FIELDS = [
+  "company_name", "logo_url", "industry", "company_description",
+  "website", "year_established", "company_size",
+] as const;
+
 const EmployerOnboardingCompany = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -45,39 +50,19 @@ const EmployerOnboardingCompany = () => {
   const { updateStep } = useEmployerOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    company_name: "",
-    logo_url: "",
-    industry: "",
-    company_description: "",
-    website: "",
-    year_established: "",
-    company_size: "",
-  });
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("employer_profiles")
-      .select("company_name, logo_url, industry, company_description, website, year_established, company_size")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data) {
-          setForm({
-            company_name: data.company_name || "",
-            logo_url: data.logo_url || "",
-            industry: data.industry || "",
-            company_description: data.company_description || "",
-            website: data.website || "",
-            year_established: data.year_established ? String(data.year_established) : "",
-            company_size: data.company_size || "",
-          });
-        }
-      });
-  }, [user]);
-
-  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+  const { form, update, clearDraft, saveNow } = useEmployerDraft(
+    "company",
+    [...DB_FIELDS],
+    {
+      company_name: "",
+      logo_url: "",
+      industry: "",
+      company_description: "",
+      website: "",
+      year_established: "",
+      company_size: "",
+    }
+  );
 
   const handleContinue = async () => {
     if (!user) return;
@@ -109,6 +94,7 @@ const EmployerOnboardingCompany = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(2);
       navigate("/employer/onboarding/location");
     }
@@ -145,7 +131,7 @@ const EmployerOnboardingCompany = () => {
 
         <div className="space-y-2">
           <Label>Company Name *</Label>
-          <Input value={form.company_name} onChange={(e) => update("company_name", e.target.value)} placeholder="Enter company name" />
+          <Input value={form.company_name} onChange={(e) => update("company_name", e.target.value)} onBlur={saveNow} placeholder="Enter company name" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -171,17 +157,17 @@ const EmployerOnboardingCompany = () => {
 
         <div className="space-y-2">
           <Label>Company Description (About Us)</Label>
-          <Textarea value={form.company_description} onChange={(e) => update("company_description", e.target.value)} placeholder="A short brief about your company..." rows={4} />
+          <Textarea value={form.company_description} onChange={(e) => update("company_description", e.target.value)} onBlur={saveNow} placeholder="A short brief about your company..." rows={4} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Website URL</Label>
-            <Input value={form.website} onChange={(e) => update("website", e.target.value)} placeholder="https://www.example.com" />
+            <Input value={form.website} onChange={(e) => update("website", e.target.value)} onBlur={saveNow} placeholder="https://www.example.com" />
           </div>
           <div className="space-y-2">
             <Label>Year of Establishment</Label>
-            <Input type="number" min={1800} max={new Date().getFullYear()} value={form.year_established} onChange={(e) => update("year_established", e.target.value)} placeholder="e.g. 2015" />
+            <Input type="number" min={1800} max={new Date().getFullYear()} value={form.year_established} onChange={(e) => update("year_established", e.target.value)} onBlur={saveNow} placeholder="e.g. 2015" />
           </div>
         </div>
       </div>

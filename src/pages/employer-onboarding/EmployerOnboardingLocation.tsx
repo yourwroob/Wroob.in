@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmployerOnboardingStatus } from "@/hooks/useEmployerOnboardingStatus";
+import { useEmployerDraft } from "@/hooks/useEmployerDraft";
 import EmployerOnboardingLayout from "@/components/onboarding/EmployerOnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { useToast } from "@/hooks/use-toast";
-import { Shield } from "lucide-react";
 
 const INDIAN_STATES_UTS = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -23,6 +23,12 @@ const INDIAN_STATES_UTS = [
   "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
 ].sort();
 
+const DB_FIELDS = [
+  "head_office_address", "city", "state", "pincode",
+  "head_office_landline", "head_office_mobile",
+  "hr_contact_name", "hr_designation", "hr_email", "hr_phone",
+] as const;
+
 const EmployerOnboardingLocation = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -30,45 +36,22 @@ const EmployerOnboardingLocation = () => {
   const { updateStep } = useEmployerOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    head_office_address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    head_office_landline: "",
-    head_office_mobile: "",
-    hr_contact_name: "",
-    hr_designation: "",
-    hr_email: "",
-    hr_phone: "",
-  });
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("employer_profiles")
-      .select("head_office_address, city, state, pincode, head_office_landline, head_office_mobile, hr_contact_name, hr_designation, hr_email, hr_phone")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data) {
-          setForm({
-            head_office_address: data.head_office_address || "",
-            city: data.city || "",
-            state: data.state || "",
-            pincode: data.pincode || "",
-            head_office_landline: data.head_office_landline || "",
-            head_office_mobile: data.head_office_mobile || "",
-            hr_contact_name: data.hr_contact_name || "",
-            hr_designation: data.hr_designation || "",
-            hr_email: data.hr_email || "",
-            hr_phone: data.hr_phone || "",
-          });
-        }
-      });
-  }, [user]);
-
-  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+  const { form, update, clearDraft, saveNow } = useEmployerDraft(
+    "location",
+    [...DB_FIELDS],
+    {
+      head_office_address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      head_office_landline: "",
+      head_office_mobile: "",
+      hr_contact_name: "",
+      hr_designation: "",
+      hr_email: "",
+      hr_phone: "",
+    }
+  );
 
   const handleContinue = async () => {
     if (!user) return;
@@ -88,7 +71,6 @@ const EmployerOnboardingLocation = () => {
       toast({ title: "HR email is required", variant: "destructive" });
       return;
     }
-    // Basic email validation
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.hr_email)) {
       toast({ title: "Please enter a valid HR email", variant: "destructive" });
       return;
@@ -116,6 +98,7 @@ const EmployerOnboardingLocation = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(3);
       navigate("/employer/onboarding/manager");
     }
@@ -129,38 +112,36 @@ const EmployerOnboardingLocation = () => {
       </p>
 
       <div className="mt-8 space-y-8">
-        {/* Location section */}
         <div className="space-y-4">
           <h2 className="font-display text-lg font-semibold">📍 Head Office Address</h2>
           <div className="space-y-2">
             <Label>Address</Label>
-            <Input value={form.head_office_address} onChange={(e) => update("head_office_address", e.target.value)} placeholder="Street address, building name..." />
+            <Input value={form.head_office_address} onChange={(e) => update("head_office_address", e.target.value)} onBlur={saveNow} placeholder="Street address, building name..." />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>City *</Label>
               <LocationAutocomplete value={form.city} onChange={(v) => update("city", v)} placeholder="City" />
             </div>
-             <div className="space-y-2">
-               <Label>State</Label>
-               <Select value={form.state} onValueChange={(v) => update("state", v)}>
-                 <SelectTrigger className="w-full">
-                   <SelectValue placeholder="Select State" />
-                 </SelectTrigger>
-                 <SelectContent>
-                   {INDIAN_STATES_UTS.map((s) => (
-                     <SelectItem key={s} value={s}>{s}</SelectItem>
-                   ))}
-                 </SelectContent>
-               </Select>
-             </div>
+            <div className="space-y-2">
+              <Label>State</Label>
+              <Select value={form.state} onValueChange={(v) => update("state", v)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select State" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INDIAN_STATES_UTS.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label>Pincode</Label>
-              <Input value={form.pincode} onChange={(e) => update("pincode", e.target.value)} placeholder="e.g. 110001" maxLength={6} />
+              <Input value={form.pincode} onChange={(e) => update("pincode", e.target.value)} onBlur={saveNow} placeholder="e.g. 110001" maxLength={6} />
             </div>
           </div>
 
-          {/* Head Office Contact */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Landline Number</Label>
@@ -169,6 +150,7 @@ const EmployerOnboardingLocation = () => {
                 inputMode="numeric"
                 value={form.head_office_landline}
                 onChange={(e) => update("head_office_landline", e.target.value.replace(/\D/g, ""))}
+                onBlur={saveNow}
                 placeholder="e.g. 01112345678"
               />
               <p className="text-xs text-muted-foreground">Optional</p>
@@ -184,6 +166,7 @@ const EmployerOnboardingLocation = () => {
                   placeholder="Enter 10-digit mobile number"
                   value={form.head_office_mobile}
                   onChange={(e) => update("head_office_mobile", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onBlur={saveNow}
                   className="flex-1"
                 />
               </div>
@@ -194,23 +177,22 @@ const EmployerOnboardingLocation = () => {
           </div>
         </div>
 
-        {/* HR Contact section */}
         <div className="space-y-4">
           <h2 className="font-display text-lg font-semibold">👤 HR / Contact Person</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Name *</Label>
-              <Input value={form.hr_contact_name} onChange={(e) => update("hr_contact_name", e.target.value)} placeholder="Full name" />
+              <Input value={form.hr_contact_name} onChange={(e) => update("hr_contact_name", e.target.value)} onBlur={saveNow} placeholder="Full name" />
             </div>
             <div className="space-y-2">
               <Label>Designation</Label>
-              <Input value={form.hr_designation} onChange={(e) => update("hr_designation", e.target.value)} placeholder="e.g. HR Manager" />
+              <Input value={form.hr_designation} onChange={(e) => update("hr_designation", e.target.value)} onBlur={saveNow} placeholder="e.g. HR Manager" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Official Email *</Label>
-              <Input type="email" value={form.hr_email} onChange={(e) => update("hr_email", e.target.value)} placeholder="hr@company.com" />
+              <Input type="email" value={form.hr_email} onChange={(e) => update("hr_email", e.target.value)} onBlur={saveNow} placeholder="hr@company.com" />
             </div>
             <div className="space-y-2">
               <Label>Phone Number</Label>
@@ -223,6 +205,7 @@ const EmployerOnboardingLocation = () => {
                   placeholder="Enter 10-digit phone number"
                   value={form.hr_phone}
                   onChange={(e) => update("hr_phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onBlur={saveNow}
                   className="flex-1"
                 />
               </div>
