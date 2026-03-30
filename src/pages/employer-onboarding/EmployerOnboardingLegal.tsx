@@ -114,17 +114,11 @@ const EmployerOnboardingLegal = () => {
             <p className="text-xs text-muted-foreground">15-character alphanumeric</p>
           </div>
           <div className="space-y-2">
-            <Label>GST Number</Label>
-            <Input value={form.gst_number} onChange={(e) => update("gst_number", e.target.value)} placeholder="If different from GSTIN" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
             <Label>PAN (Company) *</Label>
             <Input value={form.pan_number} onChange={(e) => update("pan_number", e.target.value.toUpperCase())} placeholder="e.g. ABCDE1234F" maxLength={10} />
             <p className="text-xs text-muted-foreground">10-character format: XXXXX0000X</p>
           </div>
+        </div>
           <div className="space-y-2">
             <Label>CIN (if registered)</Label>
             <Input value={form.cin} onChange={(e) => update("cin", e.target.value)} placeholder="Company Identification Number" />
