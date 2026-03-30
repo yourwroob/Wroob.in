@@ -189,7 +189,10 @@ const Profile = () => {
         preferred_course: studentProfile.preferred_course || null,
       } as any).eq("user_id", user.id);
     } else if (role === "employer") {
-      await supabase.from("employer_profiles").update(employerProfile).eq("user_id", user.id);
+      await supabase.from("employer_profiles").update({
+        ...employerProfile,
+        year_established: employerProfile.year_established ? parseInt(employerProfile.year_established) : null,
+      } as any).eq("user_id", user.id);
     }
 
     setLoading(false);
