@@ -154,6 +154,15 @@ const Navbar = () => {
                   </Badge>
                 )}
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden sm:inline-flex gap-1.5 text-xs"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Logout
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
