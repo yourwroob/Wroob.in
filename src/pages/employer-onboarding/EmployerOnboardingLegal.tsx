@@ -28,7 +28,7 @@ const EmployerOnboardingLegal = () => {
     if (!user) return;
     supabase
       .from("employer_profiles")
-      .select("gstin, gst_number, pan_number, cin, linkedin_profile")
+      .select("gstin, pan_number, cin, linkedin_profile")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }: any) => {
