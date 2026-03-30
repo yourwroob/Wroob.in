@@ -131,9 +131,19 @@ const EmployerOnboardingLocation = () => {
               <Label>City *</Label>
               <LocationAutocomplete value={form.city} onChange={(v) => update("city", v)} placeholder="City" />
             </div>
-            <div className="space-y-2">
-              <Label>State</Label>
-              <Input value={form.state} onChange={(e) => update("state", e.target.value)} placeholder="State" />
+             <div className="space-y-2">
+               <Label>State</Label>
+               <Select value={form.state} onValueChange={(v) => update("state", v)}>
+                 <SelectTrigger className="w-full">
+                   <SelectValue placeholder="Select State" />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {INDIAN_STATES_UTS.map((s) => (
+                     <SelectItem key={s} value={s}>{s}</SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+             </div>
             </div>
             <div className="space-y-2">
               <Label>Pincode</Label>
