@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { X } from "lucide-react";
+import { X, Share2, Copy, Check } from "lucide-react";
 import LocationCapture from "@/components/groups/LocationCapture";
 import AvatarUpload from "@/components/AvatarUpload";
 import FollowListDialog from "@/components/FollowListDialog";
