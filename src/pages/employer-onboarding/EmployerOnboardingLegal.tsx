@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useEmployerOnboardingStatus } from "@/hooks/useEmployerOnboardingStatus";
+import { useEmployerDraft } from "@/hooks/useEmployerDraft";
 import EmployerOnboardingLayout from "@/components/onboarding/EmployerOnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { FileText } from "lucide-react";
+
+const DB_FIELDS = ["gstin", "pan_number", "cin", "linkedin_profile"] as const;
 
 const EmployerOnboardingLegal = () => {
   const { user } = useAuth();
@@ -17,35 +20,17 @@ const EmployerOnboardingLegal = () => {
   const { updateStep } = useEmployerOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-    gstin: "",
-    pan_number: "",
-    cin: "",
-    linkedin_profile: "",
-  });
+  const { form, update, clearDraft, saveNow } = useEmployerDraft(
+    "legal",
+    [...DB_FIELDS],
+    {
+      gstin: "",
+      pan_number: "",
+      cin: "",
+      linkedin_profile: "",
+    }
+  );
 
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("employer_profiles")
-      .select("gstin, pan_number, cin, linkedin_profile")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }: any) => {
-        if (data) {
-          setForm({
-            gstin: data.gstin || "",
-            pan_number: data.pan_number || "",
-            cin: data.cin || "",
-            linkedin_profile: data.linkedin_profile || "",
-          });
-        }
-      });
-  }, [user]);
-
-  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
-
-  // Basic format validators
   const isValidGSTIN = (v: string) => !v || /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i.test(v);
   const isValidPAN = (v: string) => !v || /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(v);
   const isValidLinkedIn = (v: string) => !v || /linkedin\.com\/(company|in)\//i.test(v);
@@ -94,6 +79,7 @@ const EmployerOnboardingLegal = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(5);
       navigate("/employer/onboarding/verify");
     }
@@ -110,25 +96,25 @@ const EmployerOnboardingLegal = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>GSTIN Number *</Label>
-            <Input value={form.gstin} onChange={(e) => update("gstin", e.target.value.toUpperCase())} placeholder="e.g. 22AAAAA0000A1Z5" maxLength={15} />
+            <Input value={form.gstin} onChange={(e) => update("gstin", e.target.value.toUpperCase())} onBlur={saveNow} placeholder="e.g. 22AAAAA0000A1Z5" maxLength={15} />
             <p className="text-xs text-muted-foreground">15-character alphanumeric</p>
           </div>
           <div className="space-y-2">
             <Label>PAN (Company) *</Label>
-            <Input value={form.pan_number} onChange={(e) => update("pan_number", e.target.value.toUpperCase())} placeholder="e.g. ABCDE1234F" maxLength={10} />
+            <Input value={form.pan_number} onChange={(e) => update("pan_number", e.target.value.toUpperCase())} onBlur={saveNow} placeholder="e.g. ABCDE1234F" maxLength={10} />
             <p className="text-xs text-muted-foreground">10-character format: XXXXX0000X</p>
           </div>
         </div>
 
         <div className="space-y-2">
           <Label>CIN (if registered)</Label>
-          <Input value={form.cin} onChange={(e) => update("cin", e.target.value)} placeholder="Company Identification Number" />
+          <Input value={form.cin} onChange={(e) => update("cin", e.target.value)} onBlur={saveNow} placeholder="Company Identification Number" />
           <p className="text-xs text-muted-foreground">Optional</p>
         </div>
 
         <div className="space-y-2">
           <Label>LinkedIn Company Profile *</Label>
-          <Input value={form.linkedin_profile} onChange={(e) => update("linkedin_profile", e.target.value)} placeholder="https://www.linkedin.com/company/your-company" />
+          <Input value={form.linkedin_profile} onChange={(e) => update("linkedin_profile", e.target.value)} onBlur={saveNow} placeholder="https://www.linkedin.com/company/your-company" />
         </div>
 
         <div className="rounded-lg border bg-muted/30 p-4 flex items-start gap-3">
