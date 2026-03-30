@@ -146,6 +146,7 @@ const Profile = () => {
             cin: d.cin || "", linkedin_profile: d.linkedin_profile || "",
           });
         }
+      }
 
       const { data: skills } = await supabase.from("skills").select("name, category").order("category").order("name");
       if (skills) setAllSkills(skills);
