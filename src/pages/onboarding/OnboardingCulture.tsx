@@ -61,7 +61,6 @@ const OnboardingCulture = () => {
           setForm((f) => ({
             ...f,
             tech_interests: data.tech_interests || [],
-            tech_avoid: data.tech_avoid || [],
             motivation_type: data.motivation_type || "",
             job_priorities: data.job_priorities || [],
             remote_importance: data.remote_importance || "",
