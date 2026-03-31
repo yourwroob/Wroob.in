@@ -235,10 +235,6 @@ const SkillTests = () => {
           </div>
         )}
 
-        {/* Local Community Groups */}
-        <div className="mt-12 pt-8 border-t">
-          <LocalCommunityGroups />
-        </div>
       </div>
     </div>
   );
