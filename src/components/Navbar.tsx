@@ -14,6 +14,7 @@ import { Bell, Briefcase, LogOut, Menu, MessageCircle, Share2, User, X } from "l
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useUnreadGroupMessages } from "@/hooks/useUnreadGroupMessages";
 
