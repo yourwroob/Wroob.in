@@ -44,7 +44,6 @@ const OnboardingCulture = () => {
 
   const [form, setForm] = useState({
     tech_interests: [] as string[],
-    tech_avoid: [] as string[],
     motivation_type: "",
     job_priorities: [] as string[],
     remote_importance: "",
@@ -62,7 +61,6 @@ const OnboardingCulture = () => {
           setForm((f) => ({
             ...f,
             tech_interests: data.tech_interests || [],
-            tech_avoid: data.tech_avoid || [],
             motivation_type: data.motivation_type || "",
             job_priorities: data.job_priorities || [],
             remote_importance: data.remote_importance || "",
@@ -97,7 +95,7 @@ const OnboardingCulture = () => {
       .upsert({
         user_id: user.id,
         tech_interests: form.tech_interests,
-        tech_avoid: form.tech_avoid,
+        tech_avoid: null,
         motivation_type: form.motivation_type,
         job_priorities: form.job_priorities,
         remote_importance: form.remote_importance,
@@ -150,30 +148,6 @@ const OnboardingCulture = () => {
             </div>
           </div>
 
-          {/* Tech avoid */}
-          <div className="space-y-3">
-            <Label className="font-semibold">
-              Which technologies are you <strong className="underline">not</strong> willing to work with?
-            </Label>
-            <p className="text-xs text-muted-foreground">Pick up to 5</p>
-            <Select onValueChange={(v) => toggleTech("tech_avoid", v)}>
-              <SelectTrigger className="w-full sm:w-72">
-                <SelectValue placeholder="Search and select technologies" />
-              </SelectTrigger>
-              <SelectContent>
-                {TECHNOLOGIES.filter((t) => !form.tech_avoid.includes(t)).map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <div className="flex flex-wrap gap-2">
-              {form.tech_avoid.map((t) => (
-                <Badge key={t} variant="secondary" className="gap-1">
-                  {t} <X className="h-3 w-3 cursor-pointer" onClick={() => toggleTech("tech_avoid", t)} />
-                </Badge>
-              ))}
-            </div>
-          </div>
 
           {/* Motivation */}
           <div className="space-y-3">
