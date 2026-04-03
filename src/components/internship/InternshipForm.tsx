@@ -95,6 +95,7 @@ interface InternshipFormProps {
   onSubmit: (data: InternshipFormData, status: "draft" | "published") => Promise<void>;
   loading: boolean;
   submitLabel?: string;
+  persistKey?: string;
 }
 
 const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish Internship" }: InternshipFormProps) => {
