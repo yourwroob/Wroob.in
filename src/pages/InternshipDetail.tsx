@@ -41,10 +41,20 @@ const InternshipDetail = () => {
     const fetchData = async () => {
       const { data } = await supabase
         .from("internships")
-        .select("*, employer_profiles!internships_employer_id_fkey(company_name, logo_url, industry, website, is_verified)")
+        .select("*")
         .eq("id", id!)
         .maybeSingle();
-      setInternship(data);
+
+      if (data) {
+        const { data: ep } = await supabase
+          .from("employer_profiles")
+          .select("company_name, logo_url, industry, website, is_verified")
+          .eq("user_id", data.employer_id)
+          .maybeSingle();
+        setInternship({ ...data, employer_profiles: ep });
+      } else {
+        setInternship(null);
+      }
 
       if (user) {
         const { data: app } = await supabase.from("applications").select("id").eq("student_id", user.id).eq("internship_id", id!).maybeSingle();
