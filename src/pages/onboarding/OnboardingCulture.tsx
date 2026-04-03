@@ -43,12 +43,17 @@ const OnboardingCulture = () => {
   const { updateStep } = useOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
+  const INITIAL_CULTURE = {
     tech_interests: [] as string[],
     motivation_type: "",
     job_priorities: [] as string[],
     remote_importance: "",
-  });
+  };
+
+  const { form, setForm, clearDraft, mergeDefaults } = usePersistentForm(
+    `wroob_onboarding_culture_${user?.id || "anon"}`,
+    INITIAL_CULTURE
+  );
 
   useEffect(() => {
     if (!user) return;
