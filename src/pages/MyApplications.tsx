@@ -27,10 +27,32 @@ const MyApplications = () => {
     const fetchApplications = async () => {
       const { data } = await supabase
         .from("applications")
-        .select("*, internships(title, employer_id, employer_profiles:employer_profiles!internships_employer_id_fkey(company_name))")
+        .select("*, internships(title, employer_id)")
         .eq("student_id", user.id)
         .order("applied_at", { ascending: false });
-      setApplications(data || []);
+
+      const apps = data || [];
+
+      // Batch-fetch employer profiles for company names
+      const employerIds = [...new Set(apps.map((a: any) => a.internships?.employer_id).filter(Boolean))];
+      let employerMap: Record<string, any> = {};
+      if (employerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("employer_profiles")
+          .select("user_id, company_name")
+          .in("user_id", employerIds);
+        if (profiles) {
+          for (const p of profiles) employerMap[p.user_id] = p;
+        }
+      }
+
+      setApplications(apps.map((a: any) => ({
+        ...a,
+        internships: {
+          ...a.internships,
+          employer_profiles: employerMap[a.internships?.employer_id] || null,
+        },
+      })));
       setLoading(false);
     };
     fetchApplications();

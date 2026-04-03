@@ -45,10 +45,29 @@ const Internships = () => {
     const fetchData = async () => {
       const { data } = await supabase
         .from("internships")
-        .select("*, employer_profiles!internships_employer_id_fkey(company_name, logo_url, is_verified)")
+        .select("*")
         .eq("status", "published")
         .order("created_at", { ascending: false });
-      setInternships((data as any) || []);
+
+      const internshipsRaw = (data as any[]) || [];
+
+      // Batch-fetch employer profiles
+      const employerIds = [...new Set(internshipsRaw.map((i) => i.employer_id))];
+      let employerMap: Record<string, any> = {};
+      if (employerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from("employer_profiles")
+          .select("user_id, company_name, logo_url, is_verified")
+          .in("user_id", employerIds);
+        if (profiles) {
+          for (const p of profiles) employerMap[p.user_id] = p;
+        }
+      }
+
+      setInternships(internshipsRaw.map((i) => ({
+        ...i,
+        employer_profiles: employerMap[i.employer_id] || null,
+      })));
 
       if (user && role === "student") {
         const { data: sp } = await supabase.from("student_profiles").select("skills").eq("user_id", user.id).maybeSingle();
