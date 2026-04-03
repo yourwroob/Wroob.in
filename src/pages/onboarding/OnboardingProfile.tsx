@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { usePersistentForm } from "@/hooks/usePersistentForm";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,7 +39,7 @@ const OnboardingProfile = () => {
   const [geoLoading, setGeoLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [form, setForm] = useState({
+  const INITIAL_PROFILE = {
     location: "",
     school_category: "",
     profile_role: "",
@@ -51,7 +52,12 @@ const OnboardingProfile = () => {
     linkedin_url: "",
     website_url: "",
     phone_number: "",
-  });
+  };
+
+  const { form, setForm, clearDraft, mergeDefaults } = usePersistentForm(
+    `wroob_onboarding_profile_${user?.id || "anon"}`,
+    INITIAL_PROFILE
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -67,8 +73,7 @@ const OnboardingProfile = () => {
           const derivedCategory = savedRole
             ? SCHOOL_NAMES.find((s) => COURSE_CATEGORIES[s].includes(savedRole)) || ""
             : "";
-          setForm((f) => ({
-            ...f,
+          mergeDefaults({
             location: d.location || "",
             school_category: derivedCategory,
             profile_role: savedRole,
@@ -81,7 +86,7 @@ const OnboardingProfile = () => {
             linkedin_url: d.linkedin_url || "",
             website_url: d.website_url || "",
             phone_number: d.phone_number || "",
-          }));
+          });
         }
       });
   }, [user]);
@@ -126,6 +131,7 @@ const OnboardingProfile = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(2);
       navigate("/onboarding/culture");
     }

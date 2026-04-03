@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { usePersistentForm } from "@/hooks/usePersistentForm";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,12 +43,17 @@ const OnboardingCulture = () => {
   const { updateStep } = useOnboardingStatus();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
+  const INITIAL_CULTURE = {
     tech_interests: [] as string[],
     motivation_type: "",
     job_priorities: [] as string[],
     remote_importance: "",
-  });
+  };
+
+  const { form, setForm, clearDraft, mergeDefaults } = usePersistentForm(
+    `wroob_onboarding_culture_${user?.id || "anon"}`,
+    INITIAL_CULTURE
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -58,13 +64,12 @@ const OnboardingCulture = () => {
       .maybeSingle()
       .then(({ data }: any) => {
         if (data) {
-          setForm((f) => ({
-            ...f,
+          mergeDefaults({
             tech_interests: data.tech_interests || [],
             motivation_type: data.motivation_type || "",
             job_priorities: data.job_priorities || [],
             remote_importance: data.remote_importance || "",
-          }));
+          });
         }
       });
   }, [user]);
@@ -109,6 +114,7 @@ const OnboardingCulture = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      clearDraft();
       await updateStep(3);
       navigate("/onboarding/resume");
     }

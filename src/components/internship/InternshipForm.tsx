@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { usePersistentForm } from "@/hooks/usePersistentForm";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,9 +95,10 @@ interface InternshipFormProps {
   onSubmit: (data: InternshipFormData, status: "draft" | "published") => Promise<void>;
   loading: boolean;
   submitLabel?: string;
+  persistKey?: string;
 }
 
-const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish Internship" }: InternshipFormProps) => {
+const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish Internship", persistKey }: InternshipFormProps) => {
   const { toast } = useToast();
   const [allSkills, setAllSkills] = useState<{ name: string; category: string }[]>([]);
   const [skillSearch, setSkillSearch] = useState("");
@@ -106,10 +108,21 @@ const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish
     skills: true, description: true, selection: true, application: true,
   });
 
-  const [form, setForm] = useState<InternshipFormData>(initialData ?? defaultFormData);
+  // Use persistent form only for new postings (persistKey provided, no initialData)
+  const persistent = usePersistentForm<InternshipFormData>(
+    persistKey || "__internship_noop__",
+    initialData ?? defaultFormData
+  );
+
+  // If we have initialData (edit mode), use plain state; otherwise use persistent
+  const [plainForm, setPlainForm] = useState<InternshipFormData>(initialData ?? defaultFormData);
+
+  const form = persistKey && !initialData ? persistent.form : plainForm;
+  const setForm = persistKey && !initialData ? persistent.setForm : setPlainForm;
+  const clearDraft = persistKey && !initialData ? persistent.clearDraft : () => {};
 
   useEffect(() => {
-    if (initialData) setForm(initialData);
+    if (initialData) setPlainForm(initialData);
   }, [initialData]);
 
   useEffect(() => {
@@ -178,6 +191,7 @@ const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish
       }
     }
     await onSubmit(form, status);
+    clearDraft();
   };
 
   const SectionHeader = ({ id, icon: Icon, title }: { id: string; icon: any; title: string }) => (
