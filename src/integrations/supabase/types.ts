@@ -574,6 +574,106 @@ export type Database = {
         }
         Relationships: []
       }
+      peerup_circles: {
+        Row: {
+          created_at: string
+          creator_id: string
+          drop_in_time: string
+          expires_at: string
+          fuel_type: string
+          id: string
+          spot_location: string | null
+          spot_name: string
+          status: string
+          topic: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          drop_in_time: string
+          expires_at?: string
+          fuel_type: string
+          id?: string
+          spot_location?: string | null
+          spot_name: string
+          status?: string
+          topic: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          drop_in_time?: string
+          expires_at?: string
+          fuel_type?: string
+          id?: string
+          spot_location?: string | null
+          spot_name?: string
+          status?: string
+          topic?: string
+        }
+        Relationships: []
+      }
+      peerup_participants: {
+        Row: {
+          circle_id: string
+          id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          id?: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "peerup_participants_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "peerup_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      peerup_requests: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          requester_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "peerup_requests_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "peerup_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string
