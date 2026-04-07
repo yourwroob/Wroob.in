@@ -180,10 +180,6 @@ const CircleDetailModal = ({
         </div>
       </div>
 
-      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-        <p className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 mb-0.5">Topic on the table</p>
-        <p className="text-sm">{circle.topic}</p>
-      </div>
 
       {/* Actions */}
       {!isCreator && !isParticipant && !circle.my_request_status && (
