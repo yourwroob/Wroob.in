@@ -104,9 +104,7 @@ const StudentDiscovery = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
+          <StudentGridSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-3 opacity-40" />

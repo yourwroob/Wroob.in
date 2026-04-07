@@ -71,7 +71,7 @@ const ApplicantReview = () => {
         </Button>
 
         {loading ? (
-          <Skeleton className="h-96" />
+          <ApplicantListSkeleton />
         ) : (
           <>
             <div className="mb-8">
