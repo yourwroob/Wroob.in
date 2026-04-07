@@ -163,15 +163,15 @@ const CircleDetailModal = ({
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-muted/50 rounded-lg p-3">
-          <p className="text-[11px] text-muted-foreground mb-0.5">When</p>
-          <p className="text-sm font-medium">{formatDropInTime(circle.drop_in_time)}</p>
+          <p className="text-[11px] text-muted-foreground mb-0.5">Topic on the Table</p>
+          <p className="text-sm font-medium">{circle.topic}</p>
         </div>
         <div className="bg-muted/50 rounded-lg p-3">
-          <p className="text-[11px] text-muted-foreground mb-0.5">Where</p>
+          <p className="text-[11px] text-muted-foreground mb-0.5">Spot Location</p>
           <p className="text-sm font-medium">{circle.spot_location || circle.spot_name}</p>
         </div>
         <div className="bg-muted/50 rounded-lg p-3">
-          <p className="text-[11px] text-muted-foreground mb-0.5">Fuel</p>
+          <p className="text-[11px] text-muted-foreground mb-0.5">Fuel of the Session</p>
           <p className="text-sm font-medium">{circle.fuel_type}</p>
         </div>
         <div className="bg-muted/50 rounded-lg p-3">
