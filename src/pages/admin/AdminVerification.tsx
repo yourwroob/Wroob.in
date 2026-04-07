@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, XCircle, ExternalLink, Search, Building2, Shield } from "lucide-react";
+import { AdminVerificationSkeleton } from "@/components/skeletons";
 import {
   Dialog,
   DialogContent,
@@ -155,9 +156,7 @@ const AdminVerification = () => {
 
         {/* Company list */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
+          <AdminVerificationSkeleton />
         ) : filtered.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">

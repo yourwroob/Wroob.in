@@ -11,6 +11,7 @@ import { useReputation } from "@/hooks/useReputation";
 import { CheckCircle2, XCircle, ArrowRight, RotateCcw, Trophy } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { SkillTestsSkeleton } from "@/components/skeletons";
 import { Progress } from "@/components/ui/progress";
 
 interface TestInfo {
@@ -205,7 +206,7 @@ const SkillTests = () => {
         )}
 
         {loading ? (
-          <p className="text-muted-foreground">Loading tests...</p>
+          <SkillTestsSkeleton />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {tests.map((test) => (

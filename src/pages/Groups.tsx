@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, MapPin, Briefcase, MessageCircle } from "lucide-react";
 import GroupChat from "@/components/groups/GroupChat";
+import { GroupGridSkeleton } from "@/components/skeletons";
 
 const Groups = () => {
   const { groups, loading } = useUserGroups();
@@ -20,9 +21,7 @@ const Groups = () => {
         </p>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-          </div>
+          <GroupGridSkeleton />
         ) : groups.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center">

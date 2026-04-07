@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { InternshipCardSkeleton } from "@/components/skeletons";
 import { FileText, Building2 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -66,7 +66,7 @@ const MyApplications = () => {
         <h1 className="font-display text-3xl font-bold mb-8">My Applications</h1>
 
         {loading ? (
-          <div className="space-y-4">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24" />)}</div>
+          <div className="space-y-4">{[...Array(3)].map((_, i) => <InternshipCardSkeleton key={i} />)}</div>
         ) : applications.length === 0 ? (
           <div className="py-20 text-center">
             <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />

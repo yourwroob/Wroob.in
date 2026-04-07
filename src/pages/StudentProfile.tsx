@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, GraduationCap, Briefcase, Globe, Linkedin, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
+import { ProfileSkeleton } from "@/components/skeletons";
 import { useAuth } from "@/contexts/AuthContext";
 
 const StudentProfile = () => {
@@ -46,9 +47,7 @@ const StudentProfile = () => {
         </Link>
 
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
+          <ProfileSkeleton />
         ) : !profile ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
