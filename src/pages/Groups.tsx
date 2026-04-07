@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, MapPin, Briefcase, MessageCircle } from "lucide-react";
 import GroupChat from "@/components/groups/GroupChat";
+import { GroupGridSkeleton } from "@/components/skeletons";
 
 const Groups = () => {
   const { groups, loading } = useUserGroups();

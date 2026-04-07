@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Search, GraduationCap, MapPin, Users } from "lucide-react";
 import FollowButton from "@/components/FollowButton";
+import { StudentGridSkeleton } from "@/components/skeletons";
 import { motion } from "framer-motion";
 
 interface StudentCard {

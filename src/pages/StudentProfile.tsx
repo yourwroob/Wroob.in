@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, GraduationCap, Briefcase, Globe, Linkedin, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
+import { ProfileSkeleton } from "@/components/skeletons";
 import { useAuth } from "@/contexts/AuthContext";
 
 const StudentProfile = () => {

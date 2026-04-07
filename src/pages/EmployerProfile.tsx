@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, Globe, Linkedin, ArrowLeft, MapPin, Users, BadgeCheck, Calendar, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
+import { ProfileSkeleton } from "@/components/skeletons";
 import { useAuth } from "@/contexts/AuthContext";
 
 const EmployerProfile = () => {
