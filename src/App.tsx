@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 import LoginGreeting from "@/components/LoginGreeting";
+import ChatPopup from "@/components/chat/ChatPopup";
 import { lazy, Suspense } from "react";
 
 // Eagerly loaded (landing/auth - first paint)
@@ -76,6 +77,7 @@ const App = () => (
         <AuthProvider>
           <SessionTimeoutWarning />
           <LoginGreeting />
+          <ChatPopup />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Landing />} />

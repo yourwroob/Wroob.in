@@ -1,11 +1,11 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, GraduationCap, Briefcase, Globe, Linkedin, ArrowLeft } from "lucide-react";
+import { MapPin, GraduationCap, Briefcase, Globe, Linkedin, ArrowLeft, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfileSkeleton } from "@/components/skeletons";
@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const StudentProfile = () => {
   const { userId } = useParams<{ userId: string }>();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   const { data, isLoading } = useQuery({
     queryKey: ["public-student-profile", userId],
@@ -73,8 +73,29 @@ const StudentProfile = () => {
                     )}
                     {profile.bio && <p className="text-sm mt-2">{profile.bio}</p>}
                     {user && user.id !== userId && (
-                      <div className="mt-3">
+                      <div className="mt-3 flex items-center gap-2">
                         <FollowButton targetUserId={userId!} />
+                        {role === "student" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Dispatch custom event to open chat with this student
+                              window.dispatchEvent(
+                                new CustomEvent("open-dm", {
+                                  detail: {
+                                    partnerId: userId,
+                                    partnerName: profile.full_name || "Student",
+                                    partnerAvatar: profile.avatar_url,
+                                  },
+                                })
+                              );
+                            }}
+                          >
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Message
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
