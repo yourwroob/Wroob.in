@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { MessageCircle, X, Minimize2, Maximize2 } from "lucide-react";
