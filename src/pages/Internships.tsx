@@ -45,11 +45,16 @@ const Internships = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // FIX (HIGH-11): Cap the initial load at 100 rows.
+      // Loading the entire dataset with thousands of rows would OOM the browser tab.
+      // Client-side filtering still works within this batch.
+      // TODO: replace with server-side filtering + cursor-based pagination.
       const { data } = await supabase
         .from("internships")
         .select("*")
         .eq("status", "published")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       const internshipsRaw = (data as any[]) || [];
 

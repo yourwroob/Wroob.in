@@ -52,11 +52,23 @@ const OnboardingResume = () => {
       const { data: { publicUrl } } = supabase.storage.from("resumes").getPublicUrl(path);
       await supabase.from("student_profiles").update({ resume_url: publicUrl } as any).eq("user_id", user.id);
 
+      // FIX (HIGH-14): Complete onboarding BEFORE showing success toast and navigating.
+      // Old order: toast fires → completeOnboarding() → if DB write fails, user sees
+      // success but onboarding_status stays "pending" → Dashboard loops them back here.
+      const { error: completeError } = await completeOnboarding();
       setUploading(false);
+      if (completeError) {
+        setUploaded(false);
+        toast({
+          title: "Upload succeeded, but couldn't save progress",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setUploaded(true);
       toast({ title: "Resume uploaded successfully!" });
-
-      await completeOnboarding();
       setTimeout(() => navigate("/onboarding/done"), 500);
     };
     input.click();

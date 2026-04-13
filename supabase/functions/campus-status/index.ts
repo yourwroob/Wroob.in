@@ -119,6 +119,22 @@ Deno.serve(async (req) => {
   try {
     // POST /campus-status (create status or reply)
     if (req.method === "POST") {
+      // FIX (HIGH-8): Verify the caller is a student before allowing any POST.
+      // Only students should be able to post statuses or reply in campus circles.
+      // JWT verification only confirms identity — not role. We check user_roles here.
+      const { data: roleRow } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (roleRow?.role !== "student") {
+        return new Response(
+          JSON.stringify({ error: "Only students can post campus statuses" }),
+          { status: 403, headers: { ...responseHeaders } }
+        );
+      }
+
       const body = await req.json();
 
       if (path === "reply") {

@@ -31,8 +31,10 @@ const ChatPopup = () => {
     return () => window.removeEventListener("open-dm", handler);
   }, []);
 
-  // Only show for students
-  if (role !== "student") return null;
+  // FIX (HIGH-7): Show chat for both students and employers.
+  // The DB RLS policy was fixed (migration 20260413100017) to allow employers to
+  // read/write their own DMs. This guard was the only remaining blocker.
+  if (role !== "student" && role !== "employer") return null;
 
   const openConversation = (partnerId: string, name: string, avatar: string | null) => {
     setActivePartnerId(partnerId);

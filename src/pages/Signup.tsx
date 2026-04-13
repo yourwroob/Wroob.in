@@ -27,12 +27,19 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signUp(email, password, fullName, role);
+    const { error, needsEmailConfirmation } = await signUp(email, password, fullName, role);
     setLoading(false);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else if (needsEmailConfirmation) {
+      // Supabase project requires email confirmation — no session exists yet.
+      // Do NOT navigate to onboarding: all DB writes there require an authenticated session.
+      toast({
+        title: "Check your inbox",
+        description: "We sent a confirmation link to " + email + ". Click it to activate your account.",
+      });
     } else {
-      toast({ title: "Account created!", description: "Please check your email to verify your account." });
+      // Session established immediately (email confirmation disabled) — safe to continue.
       navigate(role === "student" ? "/onboarding/profile" : "/employer/onboarding/company");
     }
   };

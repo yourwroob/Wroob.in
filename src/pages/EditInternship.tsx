@@ -38,7 +38,11 @@ const EditInternship = () => {
         title: d.title || "",
         department: d.department || "",
         slots: d.slots ?? 5,
-        internship_category: d.internship_category === "part-time" ? "part-time" : "full-time",
+        // FIX (HIGH-13): Preserve the stored category value; only fall back to
+        // "full-time" for truly unrecognised values (not "micro-internship").
+        internship_category: (["full-time", "part-time", "micro-internship"] as const).includes(d.internship_category)
+          ? d.internship_category
+          : "full-time",
         industry: d.industry || "",
         type: d.type || "remote",
         location: d.location || "",
@@ -71,7 +75,19 @@ const EditInternship = () => {
     if (!user || !id) return;
     setLoading(true);
 
-    const appCap = form.slots * 2;
+    // FIX (HIGH-12): Never reduce app_cap below the current application_count.
+    // If an employer lowers slots from 10 → 3 when 15 applications already exist,
+    // setting app_cap = 6 would make the internship permanently appear "full".
+    // We cap at max(newCap, currentCount) to preserve the data integrity guarantee.
+    const { data: currentData } = await supabase
+      .from("internships")
+      .select("application_count")
+      .eq("id", id)
+      .eq("employer_id", user.id)
+      .maybeSingle();
+    const currentCount = (currentData as any)?.application_count ?? 0;
+    const appCap = Math.max(form.slots * 2, currentCount);
+
     const { error } = await supabase
       .from("internships")
       .update({

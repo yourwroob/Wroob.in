@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfileSkeleton } from "@/components/skeletons";
 import { useAuth } from "@/contexts/AuthContext";
+import { safeExternalUrl } from "@/lib/utils";
 
 const EmployerProfile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -124,13 +125,14 @@ const EmployerProfile = () => {
               <Card>
                 <CardHeader><CardTitle className="text-lg">Links</CardTitle></CardHeader>
                 <CardContent className="space-y-2">
-                  {ep.website && (
-                    <a href={ep.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                  {/* FIX (HIGH-6): safeExternalUrl rejects javascript:/data: schemes */}
+                  {safeExternalUrl(ep.website) && (
+                    <a href={safeExternalUrl(ep.website)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
                       <Globe className="h-4 w-4" /> Website
                     </a>
                   )}
-                  {ep.linkedin_profile && (
-                    <a href={ep.linkedin_profile} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                  {safeExternalUrl(ep.linkedin_profile) && (
+                    <a href={safeExternalUrl(ep.linkedin_profile)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
                       <Linkedin className="h-4 w-4" /> LinkedIn
                     </a>
                   )}

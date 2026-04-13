@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { safeExternalUrl } from "@/lib/utils";
 
 const BENEFIT_LABELS: Record<string, string> = {
   certificate: "Certificate",
@@ -143,6 +144,10 @@ const InternshipDetail = () => {
   const score = matchScore();
   const isFull = internship.application_count >= internship.app_cap;
   const isClosed = internship.status === "closed";
+  // FIX (HIGH-10): Disable apply after deadline even if status is still "published".
+  // The edge function only checks status === "closed"; this client-side guard prevents
+  // confusing UX where the button is active but submissions immediately fail.
+  const isDeadlinePassed = internship.deadline ? new Date(internship.deadline) < new Date() : false;
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="space-y-3">
@@ -182,8 +187,8 @@ const InternshipDetail = () => {
                       <BadgeCheck className="h-3 w-3" /> Verified
                     </Badge>
                   )}
-                  {internship.employer_profiles?.website && (
-                    <a href={internship.employer_profiles.website} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  {safeExternalUrl(internship.employer_profiles?.website) && (
+                    <a href={safeExternalUrl(internship.employer_profiles.website)} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   )}
@@ -399,9 +404,9 @@ const InternshipDetail = () => {
                   size="lg"
                   className="w-full rounded-full h-14 text-base font-semibold"
                   onClick={() => setShowApplyForm(true)}
-                  disabled={isFull || isClosed}
+                  disabled={isFull || isClosed || isDeadlinePassed}
                 >
-                  {isFull ? "Applications Full" : isClosed ? "Internship Closed" : "Apply Now"}
+                  {isFull ? "Applications Full" : isClosed ? "Internship Closed" : isDeadlinePassed ? "Deadline Passed" : "Apply Now"}
                 </Button>
               )}
             </div>

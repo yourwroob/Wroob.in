@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfileSkeleton } from "@/components/skeletons";
 import { useAuth } from "@/contexts/AuthContext";
+import { safeExternalUrl } from "@/lib/utils";
 
 const StudentProfile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -21,8 +22,12 @@ const StudentProfile = () => {
       if (!userId) throw new Error("No user ID");
 
       const [{ data: profile }, { data: studentProfile }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle(),
-        supabase.from("student_profiles").select("*").eq("user_id", userId).maybeSingle(),
+        supabase.from("profiles").select("user_id, full_name, avatar_url, bio").eq("user_id", userId).maybeSingle(),
+        // FIX (HIGH-9): Enumerate only public fields — excludes phone_number, resume_url,
+        // onboarding_* columns, and other private data from the network response.
+        supabase.from("student_profiles").select(
+          "user_id, university, profile_role, preferred_course, skills, location, experience_years, current_job_title, current_company, linkedin_url, website_url, not_employed"
+        ).eq("user_id", userId).maybeSingle(),
       ]);
 
       return { profile, studentProfile };
@@ -165,13 +170,14 @@ const StudentProfile = () => {
               <Card>
                 <CardHeader><CardTitle className="text-lg">Links</CardTitle></CardHeader>
                 <CardContent className="space-y-2">
-                  {sp.linkedin_url && (
-                    <a href={sp.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                  {/* FIX (HIGH-6): safeExternalUrl rejects javascript:/data: schemes */}
+                  {safeExternalUrl(sp.linkedin_url) && (
+                    <a href={safeExternalUrl(sp.linkedin_url)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
                       <Linkedin className="h-4 w-4" /> LinkedIn Profile
                     </a>
                   )}
-                  {sp.website_url && (
-                    <a href={sp.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                  {safeExternalUrl(sp.website_url) && (
+                    <a href={safeExternalUrl(sp.website_url)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
                       <Globe className="h-4 w-4" /> Personal Website
                     </a>
                   )}

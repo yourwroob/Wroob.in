@@ -40,10 +40,13 @@ export function useOnboardingStatus() {
       .eq("user_id", user.id);
   };
 
-  const completeOnboarding = async () => {
-    if (!user) return;
-    setStatus("completed");
-    await supabase
+  // FIX (HIGH-14): Return the DB error so callers can detect failure.
+  // Previously this returned void — a failed DB write was silently ignored,
+  // leaving onboarding_status as "pending" while showing a success toast.
+  const completeOnboarding = async (): Promise<{ error: any }> => {
+    if (!user) return { error: null };
+    setStatus("completed"); // optimistic update
+    const { error } = await supabase
       .from("student_profiles")
       .update({
         onboarding_status: "completed",
@@ -51,6 +54,8 @@ export function useOnboardingStatus() {
         onboarding_completed_at: new Date().toISOString(),
       } as any)
       .eq("user_id", user.id);
+    if (error) setStatus(null); // revert on failure so caller can retry
+    return { error };
   };
 
   return { status, step, loading, updateStep, completeOnboarding, needsOnboarding: status === "pending" };

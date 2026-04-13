@@ -36,7 +36,9 @@ export interface InternshipFormData {
   title: string;
   department: string;
   slots: number;
-  internship_category: "full-time" | "part-time";
+  // FIX (HIGH-13): Added "micro-internship" so editing an existing micro-internship
+  // no longer silently converts the category to "full-time".
+  internship_category: "full-time" | "part-time" | "micro-internship";
   industry: string;
   type: "remote" | "onsite" | "hybrid";
   location: string;
@@ -240,6 +242,7 @@ const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish
                     <SelectContent>
                       <SelectItem value="full-time">Full-time</SelectItem>
                       <SelectItem value="part-time">Part-time</SelectItem>
+                      <SelectItem value="micro-internship">Micro-internship</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

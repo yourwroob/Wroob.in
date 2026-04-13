@@ -63,8 +63,22 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // FIX (CRITICAL-5): Parse and validate the request body BEFORE the rate-limit
+    // check so that malformed/invalid requests don't consume rate-limit credits.
+    // Previously the rate limit was checked at line ~68 and the body was only
+    // parsed at ~92, meaning every bad request burned a slot.
+    const rawBody = await req.json();
+    const parsed = applySchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: parsed.error.issues.map(i => i.message).join("; ") }),
+        { status: 400, headers: { ...responseHeaders } }
+      );
+    }
+    const { internship_id, cover_letter } = parsed.data;
+
     // FIX (HIGH-4): Atomic rate limit check — single DB call with FOR UPDATE locking.
-    // Replaces the previous read-check-write TOCTOU pattern.
+    // Only reached after the body is validated, so bad requests don't consume quota.
     const { data: allowed, error: rlError } = await supabaseAdmin.rpc(
       "check_and_increment_rate_limit",
       {
@@ -88,16 +102,6 @@ Deno.serve(async (req) => {
         { status: 429, headers: { ...responseHeaders } }
       );
     }
-
-    const rawBody = await req.json();
-    const parsed = applySchema.safeParse(rawBody);
-    if (!parsed.success) {
-      return new Response(
-        JSON.stringify({ error: "Invalid input", details: parsed.error.issues.map(i => i.message).join("; ") }),
-        { status: 400, headers: { ...responseHeaders } }
-      );
-    }
-    const { internship_id, cover_letter } = parsed.data;
 
     // FIX (CRITICAL-4): All cap logic is now a single atomic transaction in the DB.
     // SELECT FOR UPDATE serializes concurrent requests; the cap cannot be exceeded.

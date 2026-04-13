@@ -22,24 +22,29 @@ const EmployerOnboardingVerify = () => {
     if (!user) return;
     supabase
       .from("employer_profiles")
-      .select("company_name, company_domain, work_email_verified")
+      // Also fetch 'website' — company_domain is not populated by the current
+      // onboarding flow, so we fall back to the website URL entered in Step 1.
+      .select("company_name, company_domain, website, work_email_verified")
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }: any) => {
         if (data) {
-          setCompany({ name: data.company_name || "", domain: data.company_domain || "" });
+          // Prefer explicit company_domain; fall back to website URL.
+          const domainSource = data.company_domain || data.website || "";
+          setCompany({ name: data.company_name || "", domain: domainSource });
           setVerified(data.work_email_verified || false);
         }
       });
   }, [user]);
 
-  // Extract domain from company domain field
+  // Extract the bare hostname from whatever URL/domain string we have.
   const getEmailDomain = () => {
+    if (!company.domain) return "";
     try {
       const url = new URL(company.domain.startsWith("http") ? company.domain : `https://${company.domain}`);
       return url.hostname.replace("www.", "");
     } catch {
-      return company.domain;
+      return company.domain.replace("www.", "");
     }
   };
 
@@ -47,13 +52,32 @@ const EmployerOnboardingVerify = () => {
     if (!user) return;
     setVerifying(true);
 
-    // For this implementation, we verify by checking if the user's signup email
-    // domain matches the company domain. In production, this would use OAuth or OTP.
     const userEmail = user.email || "";
-    const emailDomain = userEmail.split("@")[1];
-    const companyDomain = getEmailDomain();
+    const emailDomain = userEmail.split("@")[1]?.toLowerCase() ?? "";
+    const companyDomain = getEmailDomain().toLowerCase();
 
-    // For demo/development: auto-verify (in production, use OAuth/OTP)
+    // Guard: we need a company domain to compare against.
+    if (!companyDomain) {
+      setVerifying(false);
+      toast({
+        title: "Cannot verify",
+        description: "No company website was found. Please go back to Step 1 and enter your company website.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Guard: email domain must match company domain.
+    if (emailDomain !== companyDomain) {
+      setVerifying(false);
+      toast({
+        title: "Domain mismatch",
+        description: `Your sign-up email (@${emailDomain}) does not match the company domain (${companyDomain}). Please use a work email that matches your company website.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from("employer_profiles")
       .update({

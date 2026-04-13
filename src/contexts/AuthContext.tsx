@@ -11,7 +11,7 @@ interface AuthContextType {
   profile: any | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: any; needsEmailConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any }>;
@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // SECURITY: Only pass full_name and the allowed role (student|employer).
     // The trigger enforces this server-side too; this is just belt-and-suspenders.
     const allowedRole: AppRole = role === "employer" ? "employer" : "student";
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -138,7 +138,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailRedirectTo: window.location.origin,
       },
     });
-    return { error };
+    // data.session is null when the Supabase project requires email confirmation.
+    // Callers must check this to avoid navigating to authenticated routes before
+    // the user has a valid session.
+    return { error, needsEmailConfirmation: !error && !data.session };
   };
 
   const signIn = async (email: string, password: string) => {

@@ -19,7 +19,11 @@ export const GoogleSignInButton = forwardRef<HTMLButtonElement, GoogleSignInButt
       setLoading(true);
       try {
         const result = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: window.location.origin,
+          // Send the user to /dashboard after OAuth so the onboarding-check
+          // redirect logic kicks in (student → /onboarding/profile,
+          // employer → /employer/onboarding/company, no role → /select-role).
+          // Sending to origin (/) bypassed onboarding entirely.
+          redirect_uri: `${window.location.origin}/dashboard`,
         });
 
         if (result.error) {
