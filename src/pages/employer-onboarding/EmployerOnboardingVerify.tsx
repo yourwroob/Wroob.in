@@ -115,7 +115,7 @@ const EmployerOnboardingVerify = () => {
 
   const handleContinue = async () => {
     if (verified) {
-      await updateStep(5);
+      await updateStep(6);
       navigate("/employer/onboarding/team");
     }
   };
@@ -123,7 +123,7 @@ const EmployerOnboardingVerify = () => {
   // FIX (HIGH-verify-personal): Allow employers with personal emails to proceed
   // without domain verification. Their profile will show as unverified (is_verified = false).
   const handleContinueUnverified = async () => {
-    await updateStep(5);
+    await updateStep(6);
     navigate("/employer/onboarding/team");
   };
 
