@@ -63,6 +63,23 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // FIX (HIGH-employer-apply): Enforce student-only access at the function layer.
+    // apply_to_internship_atomic is SECURITY DEFINER and bypasses RLS — without this
+    // check, an employer can call the function and insert a fake application row.
+    // Use service-role client so the role lookup cannot be spoofed by the caller.
+    const { data: roleRow, error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (roleError || !roleRow || roleRow.role !== "student") {
+      return new Response(
+        JSON.stringify({ error: "Only students can apply to internships.", code: "FORBIDDEN" }),
+        { status: 403, headers: { ...responseHeaders } }
+      );
+    }
+
     // FIX (CRITICAL-5): Parse and validate the request body BEFORE the rate-limit
     // check so that malformed/invalid requests don't consume rate-limit credits.
     // Previously the rate limit was checked at line ~68 and the body was only
@@ -76,6 +93,29 @@ Deno.serve(async (req) => {
       );
     }
     const { internship_id, cover_letter } = parsed.data;
+
+    // FIX (HIGH-deadline): Validate deadline before consuming rate-limit quota.
+    // apply_to_internship_atomic checks status === 'closed' and capacity but never
+    // checks the deadline field, so applications were accepted past the cutoff date.
+    const { data: internshipMeta, error: metaError } = await supabaseAdmin
+      .from("internships")
+      .select("status, deadline")
+      .eq("id", internship_id)
+      .maybeSingle();
+
+    if (metaError || !internshipMeta) {
+      return new Response(JSON.stringify({ error: "Internship not found", code: "NOT_FOUND" }), {
+        status: 404,
+        headers: { ...responseHeaders },
+      });
+    }
+
+    if (internshipMeta.deadline && new Date(internshipMeta.deadline) < new Date()) {
+      return new Response(
+        JSON.stringify({ error: "Application deadline has passed", code: "DEADLINE_PASSED" }),
+        { status: 409, headers: { ...responseHeaders } }
+      );
+    }
 
     // FIX (HIGH-4): Atomic rate limit check — single DB call with FOR UPDATE locking.
     // Only reached after the body is validated, so bad requests don't consume quota.

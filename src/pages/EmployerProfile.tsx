@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Globe, Linkedin, ArrowLeft, MapPin, Users, BadgeCheck, Calendar, Briefcase } from "lucide-react";
+import { Building2, Globe, Linkedin, ArrowLeft, MapPin, MessageCircle, Users, BadgeCheck, Calendar, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
 import { ProfileSkeleton } from "@/components/skeletons";
@@ -92,8 +92,32 @@ const EmployerProfile = () => {
                       <p className="text-sm mt-2 line-clamp-3">{ep.company_description}</p>
                     )}
                     {user && user.id !== userId && (
-                      <div className="mt-3">
+                      <div className="mt-3 flex items-center gap-2">
                         <FollowButton targetUserId={userId!} />
+                        {/* FIX (HIGH-student-employer-dm): Students can now initiate DMs
+                            from the employer profile page — previously there was no
+                            Message button here, making student→employer DM impossible. */}
+                        {role === "student" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              window.dispatchEvent(
+                                new CustomEvent("open-dm", {
+                                  detail: {
+                                    partnerId: userId,
+                                    partnerName: ep?.company_name || "Employer",
+                                    partnerAvatar: ep?.logo_url ?? null,
+                                    partnerRole: "employer",
+                                  },
+                                })
+                              )
+                            }
+                          >
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            Message
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>

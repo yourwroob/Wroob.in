@@ -42,10 +42,14 @@ const InternshipDetail = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // FIX (HIGH-draft): Exclude drafts — but keep closed visible so applicants
+      // can view internships they already applied to after the employer closes them.
+      // Only "draft" must be blocked; "published" and "closed" are both readable.
       const { data } = await supabase
         .from("internships")
         .select("*")
         .eq("id", id!)
+        .in("status", ["published", "closed"])
         .maybeSingle();
 
       if (data) {

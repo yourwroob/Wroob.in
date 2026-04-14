@@ -55,7 +55,8 @@ const ActiveChat = ({ partnerId, partnerName, partnerAvatar, partnerRole, onBack
           // FIX (HIGH-chat-route): Use partnerRole to navigate to the correct
           // profile route. Previously hardcoded /student/:id for all partners,
           // routing employer partners to a non-existent student profile.
-          onClick={() => navigate(partnerRole === "employer" ? `/employers/${partnerId}` : `/student/${partnerId}`)}
+          // FIX (HIGH-dm-route): Route was /employers/ (plural) but App.tsx defines /employer/:userId (singular).
+          onClick={() => navigate(partnerRole === "employer" ? `/employer/${partnerId}` : `/student/${partnerId}`)}
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <Avatar className="h-7 w-7">

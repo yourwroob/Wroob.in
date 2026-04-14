@@ -135,7 +135,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       password,
       options: {
         data: { full_name: fullName, role: allowedRole },
-        emailRedirectTo: window.location.origin,
+        // FIX (HIGH-email-redirect): Redirect to /dashboard so the post-confirmation
+        // landing fires the onboarding guard in Dashboard.tsx rather than dropping
+        // the user on the public home page where no redirect logic exists.
+        emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     });
     // data.session is null when the Supabase project requires email confirmation.

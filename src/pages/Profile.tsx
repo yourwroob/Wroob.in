@@ -205,10 +205,21 @@ const Profile = () => {
       return;
     }
     setLoading(true);
-    await supabase.from("profiles").update({ full_name: profile.full_name, bio: profile.bio }).eq("user_id", user.id);
+    // FIX (HIGH-profile-save): All three update calls previously discarded errors.
+    // A network failure or RLS rejection would silently pass while the success toast fired.
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({ full_name: profile.full_name, bio: profile.bio })
+      .eq("user_id", user.id);
+
+    if (profileError) {
+      setLoading(false);
+      toast({ title: "Error saving profile", description: profileError.message, variant: "destructive" });
+      return;
+    }
 
     if (role === "student") {
-      await supabase.from("student_profiles").update({
+      const { error: spError } = await supabase.from("student_profiles").update({
         university: studentProfile.university,
         skills: studentProfile.skills,
         profile_role: studentProfile.profile_role,
@@ -223,11 +234,23 @@ const Profile = () => {
         website_url: studentProfile.website_url,
         preferred_course: studentProfile.preferred_course || null,
       } as any).eq("user_id", user.id);
+
+      if (spError) {
+        setLoading(false);
+        toast({ title: "Error saving profile", description: spError.message, variant: "destructive" });
+        return;
+      }
     } else if (role === "employer") {
-      await supabase.from("employer_profiles").update({
+      const { error: epError } = await supabase.from("employer_profiles").update({
         ...employerProfile,
         year_established: employerProfile.year_established ? parseInt(employerProfile.year_established) : null,
       } as any).eq("user_id", user.id);
+
+      if (epError) {
+        setLoading(false);
+        toast({ title: "Error saving profile", description: epError.message, variant: "destructive" });
+        return;
+      }
     }
 
     setLoading(false);

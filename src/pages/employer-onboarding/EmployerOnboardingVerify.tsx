@@ -59,11 +59,15 @@ const EmployerOnboardingVerify = () => {
     const companyDomain = getEmailDomain().toLowerCase();
 
     // Guard: we need a company domain to compare against.
+    // FIX (HIGH-verify-nodomain): Also set domainMismatch so the amber escape hatch
+    // renders — previously the "Continue without verification" button was never shown
+    // when no website was set, leaving employers dead-ended on this step.
     if (!companyDomain) {
       setVerifying(false);
+      setDomainMismatch(true);
       toast({
-        title: "Cannot verify",
-        description: "No company website was found. Please go back to Step 1 and enter your company website.",
+        title: "No company website found",
+        description: "Go back to Step 1 to add your company website, or use \"Continue without verification\" below.",
         variant: "destructive",
       });
       return;

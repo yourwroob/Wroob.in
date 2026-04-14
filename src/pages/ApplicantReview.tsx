@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApplicantListSkeleton } from "@/components/skeletons";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Download, Users } from "lucide-react";
+import { ArrowLeft, Download, MessageCircle, Users } from "lucide-react";
 import { CandidateScoreBadge } from "@/components/reputation/ReputationScoreCard";
 
 const statusColors: Record<string, string> = {
@@ -151,6 +151,28 @@ const ApplicantReview = () => {
                                 </a>
                               </Button>
                             )}
+                            {/* FIX (HIGH-employer-dm): Employers can now initiate DMs
+                                directly from the applicant card without visiting the
+                                student's public profile page first. */}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1"
+                              onClick={() =>
+                                window.dispatchEvent(
+                                  new CustomEvent("open-dm", {
+                                    detail: {
+                                      partnerId: app.student_id,
+                                      partnerName: app.profiles?.full_name || "Applicant",
+                                      partnerAvatar: app.profiles?.avatar_url ?? null,
+                                      partnerRole: "student",
+                                    },
+                                  })
+                                )
+                              }
+                            >
+                              <MessageCircle className="h-3 w-3" /> Message
+                            </Button>
                           </div>
                         </div>
                       </CardContent>

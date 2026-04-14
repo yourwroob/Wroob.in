@@ -116,21 +116,39 @@ export function useDirectMessages() {
 
     if (!user) return;
 
+    // FIX (HIGH-dm-privacy): Replace shared unfiltered "dm-realtime" channel with
+    // per-user channels that carry server-side row filters. The old approach subscribed
+    // all connected users to the same channel without a filter — Supabase delivered
+    // every direct_message INSERT payload (including text) to every subscriber, and
+    // the existing client-side `if (sender_id === user.id || receiver_id === user.id)`
+    // guard only controlled whether to re-fetch, not whether the payload was received.
+    //
+    // With server-side filters, Supabase only delivers rows that match the filter to
+    // this subscriber. Two subscriptions on the same channel object cover both sides
+    // of a conversation:
+    //   • sender_id=eq.{user.id}  → messages this user sent (outbox)
+    //   • receiver_id=eq.{user.id} → messages this user received (inbox)
     const channel = supabase
-      .channel("dm-realtime")
+      .channel(`dm-user-${user.id}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "direct_messages",
+          filter: `sender_id=eq.${user.id}`,
         },
-        (payload) => {
-          const msg = payload.new as DirectMessage;
-          if (msg.sender_id === user.id || msg.receiver_id === user.id) {
-            fetchConversations();
-          }
-        }
+        () => { fetchConversations(); }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "direct_messages",
+          filter: `receiver_id=eq.${user.id}`,
+        },
+        () => { fetchConversations(); }
       )
       .on(
         "postgres_changes",
@@ -138,10 +156,9 @@ export function useDirectMessages() {
           event: "UPDATE",
           schema: "public",
           table: "direct_messages",
+          filter: `receiver_id=eq.${user.id}`,
         },
-        () => {
-          fetchConversations();
-        }
+        () => { fetchConversations(); }
       )
       .subscribe();
 
@@ -184,30 +201,45 @@ export function useChatMessages(partnerId: string | null) {
       .eq("read", false)
       .then(() => {});
 
+    // FIX (HIGH-dm-privacy): Use per-user server-side filters — same approach as
+    // useDirectMessages. Two subscriptions: one for messages sent by this user to
+    // the partner, one for messages received from the partner.
     const channel = supabase
-      .channel(`dm-chat-${partnerId}`)
+      .channel(`dm-chat-${user.id}-${partnerId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "direct_messages",
+          filter: `receiver_id=eq.${user.id}`,
         },
         (payload) => {
           const msg = payload.new as DirectMessage;
-          if (
-            (msg.sender_id === user.id && msg.receiver_id === partnerId) ||
-            (msg.sender_id === partnerId && msg.receiver_id === user.id)
-          ) {
+          // Server guarantees receiver_id === user.id; additionally confirm sender.
+          if (msg.sender_id === partnerId) {
             setMessages((prev) => [...prev, msg]);
-            // Mark as read if received
-            if (msg.receiver_id === user.id) {
-              supabase
-                .from("direct_messages")
-                .update({ read: true })
-                .eq("id", msg.id)
-                .then(() => {});
-            }
+            supabase
+              .from("direct_messages")
+              .update({ read: true })
+              .eq("id", msg.id)
+              .then(() => {});
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "direct_messages",
+          filter: `sender_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const msg = payload.new as DirectMessage;
+          // Server guarantees sender_id === user.id; additionally confirm receiver.
+          if (msg.receiver_id === partnerId) {
+            setMessages((prev) => [...prev, msg]);
           }
         }
       )

@@ -80,12 +80,14 @@ const StudentProfile = () => {
                     {user && user.id !== userId && (
                       <div className="mt-3 flex items-center gap-2">
                         <FollowButton targetUserId={userId!} />
-                        {role === "student" && (
+                        {(role === "student" || role === "employer") && (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              // Dispatch custom event to open chat with this student
+                              // Dispatch custom event to open chat with this student.
+                              // FIX (HIGH-employer-dm): Allow employers to initiate DMs
+                              // from a student profile page — previously gated to students only.
                               window.dispatchEvent(
                                 new CustomEvent("open-dm", {
                                   detail: {
