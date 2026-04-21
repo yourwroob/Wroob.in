@@ -19,7 +19,8 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  // Preserve the current path so login can redirect back after auth.
+  if (!user) return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
 
   if (location.pathname === "/select-role") return <>{children}</>;
 
