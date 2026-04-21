@@ -383,7 +383,7 @@ const InternshipDetail = () => {
 
           {/* Apply section */}
           {role === "student" && (
-            <div className="sticky bottom-6 pt-4">
+            <div className="sticky bottom-0 z-10 pt-6 pb-4 bg-gradient-to-t from-background via-background/95 to-transparent">
               {hasApplied ? (
                 <div className="flex items-center gap-2 rounded-xl bg-success/10 p-4 text-success">
                   <CheckCircle className="h-5 w-5" />

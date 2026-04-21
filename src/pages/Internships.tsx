@@ -236,7 +236,7 @@ const Internships = () => {
                             )}
                           </div>
                           <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{intern.description}</p>
-                          <div className="mt-4 flex items-center justify-between">
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-y-2">
                             <div className="flex flex-wrap gap-1.5">
                               {intern.skills_required.slice(0, 4).map((s) => (
                                 <span key={s} className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">{s}</span>
@@ -245,7 +245,7 @@ const Internships = () => {
                                 <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground">+{intern.skills_required.length - 4}</span>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                               {intern.stipend_amount != null && intern.stipend_amount > 0 && (
                                 <span className="flex items-center gap-1 font-medium text-foreground"><IndianRupee className="h-3 w-3" />₹{intern.stipend_amount.toLocaleString("en-IN")}/mo</span>
                               )}

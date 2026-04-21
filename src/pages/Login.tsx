@@ -56,7 +56,7 @@ const Login = () => {
                 </div>
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full rounded-full brand-gradient border-0 text-white shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200" disabled={loading}>
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
             </form>

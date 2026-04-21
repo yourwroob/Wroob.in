@@ -765,7 +765,7 @@ const Profile = () => {
             </>
           )}
 
-          <Button onClick={handleSave} disabled={loading} className="w-full">
+          <Button onClick={handleSave} disabled={loading} size="lg" className="w-full rounded-full brand-gradient border-0 text-white shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200">
             {loading ? "Saving..." : "Save Profile"}
           </Button>
         </div>

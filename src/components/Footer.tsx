@@ -78,7 +78,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-background/8">
+      <div className="border-t border-background/[0.08]">
         <div className="container flex items-center justify-between py-5">
           <p className="text-xs text-background/60">© 2026 Wroob. All rights reserved.</p>
         </div>

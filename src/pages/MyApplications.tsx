@@ -79,7 +79,7 @@ const MyApplications = () => {
           <div className="space-y-4">
             {applications.map((app) => (
               <Link key={app.id} to={`/internships/${app.internship_id}`}>
-                <Card className="transition-all hover:shadow-md">
+                <Card className="transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
                   <CardContent className="flex items-center justify-between p-6">
                     <div>
                       <h3 className="font-semibold">{app.internships?.title}</h3>
@@ -94,7 +94,7 @@ const MyApplications = () => {
                       </p>
                     </div>
                     <Badge className={statusColors[app.status] || ""} variant="outline">
-                      {app.status}
+                      {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                     </Badge>
                   </CardContent>
                 </Card>
