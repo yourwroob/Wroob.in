@@ -381,10 +381,23 @@ const InternshipDetail = () => {
             </div>
           )}
 
-          {/* Apply section */}
-          {role === "student" && (
+          {/* Apply section — visible to guests and students; hidden for employers/admins */}
+          {(!user || role === "student") && (
             <div className="sticky bottom-0 z-10 pt-6 pb-4 bg-gradient-to-t from-background via-background/95 to-transparent">
-              {hasApplied ? (
+              {!user ? (
+                <div className="space-y-2">
+                  <Button
+                    size="lg"
+                    className="w-full rounded-full h-14 text-base font-semibold brand-gradient border-0 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-200"
+                    onClick={() => navigate(`/login?redirect=/internships/${id}`)}
+                  >
+                    Apply Now
+                  </Button>
+                  <p className="text-center text-xs text-muted-foreground">
+                    Login required to apply
+                  </p>
+                </div>
+              ) : hasApplied ? (
                 <div className="flex items-center gap-2 rounded-xl bg-success/10 p-4 text-success">
                   <CheckCircle className="h-5 w-5" />
                   <span className="font-medium">You've already applied to this internship</span>

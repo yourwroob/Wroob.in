@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,10 @@ const Login = () => {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  // Only accept relative paths — prevents open redirect to external sites
+  const rawRedirect = searchParams.get("redirect") || "";
+  const redirectTo = rawRedirect.startsWith("/") ? rawRedirect : "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +30,7 @@ const Login = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       sessionStorage.setItem("wroob_just_logged_in", "true");
-      navigate("/dashboard");
+      navigate(redirectTo);
     }
   };
 
@@ -41,7 +45,9 @@ const Login = () => {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-display text-2xl">Welcome back</CardTitle>
-            <CardDescription>Sign in to your account</CardDescription>
+            <CardDescription>
+              {redirectTo !== "/dashboard" ? "Sign in to continue" : "Sign in to your account"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
