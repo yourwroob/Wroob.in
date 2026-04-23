@@ -15,13 +15,28 @@ const Notifications = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+
+  const fetchNotifications = async () => {
+    if (!user) return;
+    setLoading(true);
+    setFetchError(false);
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (error) {
+      setFetchError(true);
+    } else {
+      setNotifications(data || []);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (!user) return;
-    supabase.from("notifications").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).then(({ data }) => {
-      setNotifications(data || []);
-      setLoading(false);
-    });
+    fetchNotifications();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const markAllRead = async () => {
@@ -51,6 +66,13 @@ const Notifications = () => {
 
         {loading ? (
           <NotificationSkeleton />
+        ) : fetchError ? (
+          <div className="py-20 text-center">
+            <Bell className="mx-auto h-12 w-12 text-muted-foreground/50" />
+            <h3 className="mt-4 font-display text-xl font-semibold">Failed to load notifications</h3>
+            <p className="mt-2 text-muted-foreground">Something went wrong. Please try again.</p>
+            <Button variant="outline" className="mt-4" onClick={fetchNotifications}>Retry</Button>
+          </div>
         ) : notifications.length === 0 ? (
           <div className="py-20 text-center">
             <Bell className="mx-auto h-12 w-12 text-muted-foreground/50" />

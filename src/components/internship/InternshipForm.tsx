@@ -237,7 +237,7 @@ const InternshipForm = ({ initialData, onSubmit, loading, submitLabel = "Publish
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Internship Type *</Label>
-                  <Select value={form.internship_category} onValueChange={(v: any) => update("internship_category", v)}>
+                  <Select value={form.internship_category} onValueChange={(v: InternshipFormData["internship_category"]) => update("internship_category", v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="full-time">Full-time</SelectItem>

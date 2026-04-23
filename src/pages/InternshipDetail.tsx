@@ -95,6 +95,10 @@ const InternshipDetail = () => {
 
       if (res.error || res.data?.error) {
         const code = res.data?.code;
+        if (code === "CAPACITY_REACHED") {
+          setShowApplyForm(false);
+          setInternship((prev: any) => ({ ...prev, status: "closed" }));
+        }
         const msg = code === "RATE_LIMITED"
           ? "⏳ You're applying too fast. Please wait a moment and try again."
           : code === "CAPACITY_REACHED"

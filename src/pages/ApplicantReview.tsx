@@ -165,13 +165,15 @@ const ApplicantReview = () => {
                                 <SelectItem value="rejected">Rejected</SelectItem>
                               </SelectContent>
                             </Select>
-                            {app.student_profiles?.resume_url && resumeSignedUrls[app.id] && (
+                            {app.student_profiles?.resume_url && resumeSignedUrls[app.id] ? (
                               <Button variant="outline" size="sm" className="gap-1" asChild>
                                 <a href={resumeSignedUrls[app.id]} target="_blank" rel="noopener">
                                   <Download className="h-3 w-3" /> Resume
                                 </a>
                               </Button>
-                            )}
+                            ) : !app.student_profiles?.resume_url ? (
+                              <span className="text-xs text-muted-foreground">No resume uploaded</span>
+                            ) : null}
                             {/* FIX (HIGH-employer-dm): Employers can now initiate DMs
                                 directly from the applicant card without visiting the
                                 student's public profile page first. */}

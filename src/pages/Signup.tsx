@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, Building2 } from "lucide-react";
+import { GraduationCap, Building2, Mail, RotateCcw } from "lucide-react";
 import wroobeLogo from "@/assets/wroob-logo.png";
 import { cn } from "@/lib/utils";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
@@ -20,6 +21,8 @@ const Signup = () => {
     (searchParams.get("role") as "student" | "employer") || "student"
   );
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -32,17 +35,68 @@ const Signup = () => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else if (needsEmailConfirmation) {
-      // Supabase project requires email confirmation — no session exists yet.
-      // Do NOT navigate to onboarding: all DB writes there require an authenticated session.
-      toast({
-        title: "Check your inbox",
-        description: "We sent a confirmation link to " + email + ". Click it to activate your account.",
-      });
+      // Switch to confirmation screen — do NOT navigate to onboarding yet because
+      // all DB writes there require an authenticated session.
+      setEmailSent(true);
     } else {
       // Session established immediately (email confirmation disabled) — safe to continue.
       navigate(role === "student" ? "/onboarding/profile" : "/employer/onboarding/company");
     }
   };
+
+  const handleResend = async () => {
+    setResending(true);
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setResending(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Email resent", description: "Check your inbox again." });
+    }
+  };
+
+  if (emailSent) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center">
+            <Link to="/">
+              <img src={wroobeLogo} alt="Wroob" className="h-14 mx-auto" />
+            </Link>
+          </div>
+          <Card>
+            <CardContent className="pt-8 pb-8 text-center space-y-4">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                <Mail className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="font-display text-2xl font-bold">Check your inbox</h2>
+              <p className="text-muted-foreground text-sm">
+                We sent a confirmation link to{" "}
+                <span className="font-medium text-foreground">{email}</span>.
+                Click it to activate your account and continue.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Didn't receive it? Check your spam folder or resend below.
+              </p>
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={handleResend}
+                disabled={resending}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {resending ? "Sending..." : "Resend confirmation email"}
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                Already confirmed?{" "}
+                <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">

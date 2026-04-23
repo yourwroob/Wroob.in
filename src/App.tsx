@@ -110,7 +110,7 @@ const App = () => (
               <Route path="/internships/:id/edit" element={<ProtectedRoute allowedRoles={["employer"]}><EditInternship /></ProtectedRoute>} />
               <Route path="/internships/:id/applicants" element={<ProtectedRoute allowedRoles={["employer"]}><ApplicantReview /></ProtectedRoute>} />
               <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-              <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+              <Route path="/groups" element={<ProtectedRoute allowedRoles={["student", "employer"]}><Groups /></ProtectedRoute>} />
               <Route path="/students" element={<ProtectedRoute allowedRoles={["student", "employer"]}><StudentDiscovery /></ProtectedRoute>} />
               <Route path="/skill-tests" element={<ProtectedRoute allowedRoles={["student"]}><SkillTests /></ProtectedRoute>} />
               <Route path="/campus" element={<ProtectedRoute allowedRoles={["student"]}><CampusCommunity /></ProtectedRoute>} />

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +36,20 @@ interface CompanyCard {
   company_size: string | null;
 }
 
+const DISC_PAGE_SIZE = 20;
+
 const StudentDiscovery = () => {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("students");
+  const [studentOffset, setStudentOffset] = useState(0);
+  const [companyOffset, setCompanyOffset] = useState(0);
+  const [moreStudents, setMoreStudents] = useState<StudentCard[]>([]);
+  const [moreCompanies, setMoreCompanies] = useState<CompanyCard[]>([]);
+  const [hasMoreStudents, setHasMoreStudents] = useState(false);
+  const [hasMoreCompanies, setHasMoreCompanies] = useState(false);
+  const [loadingMoreStudents, setLoadingMoreStudents] = useState(false);
+  const [loadingMoreCompanies, setLoadingMoreCompanies] = useState(false);
 
   const { data: students = [], isLoading } = useQuery({
     queryKey: ["student-discovery"],
@@ -47,9 +58,12 @@ const StudentDiscovery = () => {
         .from("student_profiles")
         .select("user_id, university, major, skills, location, graduation_year")
         .eq("onboarding_status", "completed")
-        .limit(100);
+        .range(0, DISC_PAGE_SIZE - 1);
 
       if (!studentProfiles || studentProfiles.length === 0) return [];
+
+      setHasMoreStudents(studentProfiles.length === DISC_PAGE_SIZE);
+      setStudentOffset(studentProfiles.length);
 
       const userIds = studentProfiles.map((s) => s.user_id);
       const { data: profiles } = await supabase
@@ -77,14 +91,58 @@ const StudentDiscovery = () => {
         .from("employer_profiles")
         .select("user_id, company_name, industry, city, state, logo_url, company_size")
         .eq("onboarding_status", "completed")
-        .limit(100);
+        .range(0, DISC_PAGE_SIZE - 1);
+
+      setHasMoreCompanies((employerProfiles?.length ?? 0) === DISC_PAGE_SIZE);
+      setCompanyOffset(employerProfiles?.length ?? 0);
 
       return (employerProfiles ?? []) as CompanyCard[];
     },
     enabled: !!user && activeTab === "companies",
   });
 
-  const filtered = students.filter((s) => {
+  const handleLoadMoreStudents = async () => {
+    setLoadingMoreStudents(true);
+    const { data: sp } = await supabase
+      .from("student_profiles")
+      .select("user_id, university, major, skills, location, graduation_year")
+      .eq("onboarding_status", "completed")
+      .range(studentOffset, studentOffset + DISC_PAGE_SIZE - 1);
+    const batch = sp ?? [];
+    if (batch.length > 0) {
+      const userIds = batch.map((s) => s.user_id);
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, avatar_url").in("user_id", userIds);
+      const profileMap = new Map((profiles ?? []).map((p) => [p.user_id, p]));
+      const enriched = batch.map((s) => ({
+        ...s,
+        full_name: profileMap.get(s.user_id)?.full_name ?? null,
+        avatar_url: profileMap.get(s.user_id)?.avatar_url ?? null,
+      })) as StudentCard[];
+      setMoreStudents((prev) => [...prev, ...enriched]);
+      setStudentOffset((prev) => prev + batch.length);
+    }
+    setHasMoreStudents(batch.length === DISC_PAGE_SIZE);
+    setLoadingMoreStudents(false);
+  };
+
+  const handleLoadMoreCompanies = async () => {
+    setLoadingMoreCompanies(true);
+    const { data: ep } = await supabase
+      .from("employer_profiles")
+      .select("user_id, company_name, industry, city, state, logo_url, company_size")
+      .eq("onboarding_status", "completed")
+      .range(companyOffset, companyOffset + DISC_PAGE_SIZE - 1);
+    const batch = (ep ?? []) as CompanyCard[];
+    setMoreCompanies((prev) => [...prev, ...batch]);
+    setCompanyOffset((prev) => prev + batch.length);
+    setHasMoreCompanies(batch.length === DISC_PAGE_SIZE);
+    setLoadingMoreCompanies(false);
+  };
+
+  const allStudents = [...students, ...moreStudents];
+  const allCompanies = [...companies, ...moreCompanies];
+
+  const filtered = allStudents.filter((s) => {
     if (!search) return s.user_id !== user?.id;
     const q = search.toLowerCase();
     return (
@@ -97,7 +155,7 @@ const StudentDiscovery = () => {
     );
   });
 
-  const filteredCompanies = companies.filter((c) => {
+  const filteredCompanies = allCompanies.filter((c) => {
     if (!search) return true;
     const q = search.toLowerCase();
     return (
@@ -162,68 +220,77 @@ const StudentDiscovery = () => {
                 <p className="text-sm">Try adjusting your search terms.</p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {filtered.map((student, i) => (
-                  <motion.div
-                    key={student.user_id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04, duration: 0.3 }}
-                  >
-                    <Card className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-5">
-                        <div className="flex items-start gap-4">
-                          <Avatar className="h-14 w-14 shrink-0">
-                            <AvatarImage src={student.avatar_url ?? undefined} />
-                            <AvatarFallback className="brand-gradient text-white text-sm font-semibold">
-                              {getInitials(student.full_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <ProfileLink userId={student.user_id} type="student" className="font-semibold text-foreground truncate block">
-                                  {student.full_name || "Student"}
-                                </ProfileLink>
-                                {student.university && (
-                                  <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                    <GraduationCap className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">
-                                      {student.major ? `${student.major} · ` : ""}
-                                      {student.university}
-                                    </span>
-                                  </p>
-                                )}
-                                {student.location && (
-                                  <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">{student.location}</span>
-                                  </p>
-                                )}
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {filtered.map((student, i) => (
+                    <motion.div
+                      key={student.user_id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04, duration: 0.3 }}
+                    >
+                      <Card className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-5">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="h-14 w-14 shrink-0">
+                              <AvatarImage src={student.avatar_url ?? undefined} />
+                              <AvatarFallback className="brand-gradient text-white text-sm font-semibold">
+                                {getInitials(student.full_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <ProfileLink userId={student.user_id} type="student" className="font-semibold text-foreground truncate block">
+                                    {student.full_name || "Student"}
+                                  </ProfileLink>
+                                  {student.university && (
+                                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                                      <GraduationCap className="h-3.5 w-3.5 shrink-0" />
+                                      <span className="truncate">
+                                        {student.major ? `${student.major} · ` : ""}
+                                        {student.university}
+                                      </span>
+                                    </p>
+                                  )}
+                                  {student.location && (
+                                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                                      <span className="truncate">{student.location}</span>
+                                    </p>
+                                  )}
+                                </div>
+                                <FollowButton targetUserId={student.user_id} />
                               </div>
-                              <FollowButton targetUserId={student.user_id} />
+                              {student.skills && student.skills.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                  {student.skills.slice(0, 4).map((skill) => (
+                                    <Badge key={skill} variant="secondary" className="text-xs">
+                                      {skill}
+                                    </Badge>
+                                  ))}
+                                  {student.skills.length > 4 && (
+                                    <Badge variant="outline" className="text-xs">
+                                      +{student.skills.length - 4}
+                                    </Badge>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                            {student.skills && student.skills.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 mt-3">
-                                {student.skills.slice(0, 4).map((skill) => (
-                                  <Badge key={skill} variant="secondary" className="text-xs">
-                                    {skill}
-                                  </Badge>
-                                ))}
-                                {student.skills.length > 4 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{student.skills.length - 4}
-                                  </Badge>
-                                )}
-                              </div>
-                            )}
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+                {hasMoreStudents && !search && (
+                  <div className="pt-6 text-center">
+                    <Button variant="outline" onClick={handleLoadMoreStudents} disabled={loadingMoreStudents}>
+                      {loadingMoreStudents ? "Loading..." : "Load More"}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
 
@@ -237,58 +304,67 @@ const StudentDiscovery = () => {
                 <p className="text-sm">Try adjusting your search terms.</p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {filteredCompanies.map((company, i) => (
-                  <motion.div
-                    key={company.user_id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04, duration: 0.3 }}
-                  >
-                    <Card className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-5">
-                        <div className="flex items-start gap-4">
-                          <Avatar className="h-14 w-14 shrink-0">
-                            <AvatarImage src={company.logo_url ?? undefined} />
-                            <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                              {getInitials(company.company_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="min-w-0">
-                                <ProfileLink userId={company.user_id} type="employer" className="font-semibold text-foreground truncate block">
-                                  {company.company_name || "Company"}
-                                </ProfileLink>
-                                {company.industry && (
-                                  <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                    <Building2 className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">{company.industry}</span>
-                                  </p>
-                                )}
-                                {(company.city || company.state) && (
-                                  <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                                    <MapPin className="h-3.5 w-3.5 shrink-0" />
-                                    <span className="truncate">
-                                      {[company.city, company.state].filter(Boolean).join(", ")}
-                                    </span>
-                                  </p>
-                                )}
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {filteredCompanies.map((company, i) => (
+                    <motion.div
+                      key={company.user_id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04, duration: 0.3 }}
+                    >
+                      <Card className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-5">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="h-14 w-14 shrink-0">
+                              <AvatarImage src={company.logo_url ?? undefined} />
+                              <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
+                                {getInitials(company.company_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                  <ProfileLink userId={company.user_id} type="employer" className="font-semibold text-foreground truncate block">
+                                    {company.company_name || "Company"}
+                                  </ProfileLink>
+                                  {company.industry && (
+                                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                                      <Building2 className="h-3.5 w-3.5 shrink-0" />
+                                      <span className="truncate">{company.industry}</span>
+                                    </p>
+                                  )}
+                                  {(company.city || company.state) && (
+                                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                                      <MapPin className="h-3.5 w-3.5 shrink-0" />
+                                      <span className="truncate">
+                                        {[company.city, company.state].filter(Boolean).join(", ")}
+                                      </span>
+                                    </p>
+                                  )}
+                                </div>
+                                <FollowButton targetUserId={company.user_id} />
                               </div>
-                              <FollowButton targetUserId={company.user_id} />
+                              {company.company_size && (
+                                <Badge variant="secondary" className="text-xs mt-3">
+                                  {company.company_size} employees
+                                </Badge>
+                              )}
                             </div>
-                            {company.company_size && (
-                              <Badge variant="secondary" className="text-xs mt-3">
-                                {company.company_size} employees
-                              </Badge>
-                            )}
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+                {hasMoreCompanies && !search && (
+                  <div className="pt-6 text-center">
+                    <Button variant="outline" onClick={handleLoadMoreCompanies} disabled={loadingMoreCompanies}>
+                      {loadingMoreCompanies ? "Loading..." : "Load More"}
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
         </Tabs>

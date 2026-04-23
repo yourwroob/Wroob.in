@@ -32,10 +32,15 @@ interface Internship {
   employer_profiles?: { company_name: string; logo_url: string; is_verified: boolean | null } | null;
 }
 
+const PAGE_SIZE = 20;
+
 const Internships = () => {
   const { user, role } = useAuth();
   const [internships, setInternships] = useState<Internship[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -43,38 +48,37 @@ const Internships = () => {
   const [durationFilter, setDurationFilter] = useState("all");
   const [studentSkills, setStudentSkills] = useState<string[]>([]);
 
+  const fetchBatch = async (batchOffset: number, append: boolean) => {
+    const { data } = await supabase
+      .from("internships")
+      .select("*")
+      .eq("status", "published")
+      .order("created_at", { ascending: false })
+      .range(batchOffset, batchOffset + PAGE_SIZE - 1);
+
+    const batch = (data as any[]) || [];
+
+    const employerIds = [...new Set(batch.map((i) => i.employer_id))];
+    let employerMap: Record<string, any> = {};
+    if (employerIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("employer_profiles")
+        .select("user_id, company_name, logo_url, is_verified")
+        .in("user_id", employerIds);
+      if (profiles) {
+        for (const p of profiles) employerMap[p.user_id] = p;
+      }
+    }
+
+    const enriched = batch.map((i) => ({ ...i, employer_profiles: employerMap[i.employer_id] || null }));
+    setInternships((prev) => append ? [...prev, ...enriched] : enriched);
+    setHasMore(batch.length === PAGE_SIZE);
+    setOffset(batchOffset + batch.length);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      // FIX (HIGH-11): Cap the initial load at 100 rows.
-      // Loading the entire dataset with thousands of rows would OOM the browser tab.
-      // Client-side filtering still works within this batch.
-      // TODO: replace with server-side filtering + cursor-based pagination.
-      const { data } = await supabase
-        .from("internships")
-        .select("*")
-        .eq("status", "published")
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      const internshipsRaw = (data as any[]) || [];
-
-      // Batch-fetch employer profiles
-      const employerIds = [...new Set(internshipsRaw.map((i) => i.employer_id))];
-      let employerMap: Record<string, any> = {};
-      if (employerIds.length > 0) {
-        const { data: profiles } = await supabase
-          .from("employer_profiles")
-          .select("user_id, company_name, logo_url, is_verified")
-          .in("user_id", employerIds);
-        if (profiles) {
-          for (const p of profiles) employerMap[p.user_id] = p;
-        }
-      }
-
-      setInternships(internshipsRaw.map((i) => ({
-        ...i,
-        employer_profiles: employerMap[i.employer_id] || null,
-      })));
+      await fetchBatch(0, false);
 
       if (user && role === "student") {
         const { data: sp } = await supabase.from("student_profiles").select("skills").eq("user_id", user.id).maybeSingle();
@@ -83,7 +87,14 @@ const Internships = () => {
       setLoading(false);
     };
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, role]);
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    await fetchBatch(offset, true);
+    setLoadingMore(false);
+  };
 
   const calcMatchScore = (required: string[]) => {
     if (!studentSkills.length || !required.length) return 0;
@@ -260,6 +271,13 @@ const Internships = () => {
                     </motion.div>
                   );
                 })}
+                {hasMore && (
+                  <div className="pt-4 text-center">
+                    <Button variant="outline" onClick={handleLoadMore} disabled={loadingMore}>
+                      {loadingMore ? "Loading..." : "Load More"}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>

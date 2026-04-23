@@ -74,7 +74,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
       // Still refresh in background
     } else if (!isInitial) {
-      // Don't set loading=true on subsequent auth changes to avoid flicker
+      // For a fresh SIGNED_IN (no cached role for this user), hold loading=true
+      // while the role is fetched so ProtectedRoute doesn't redirect prematurely.
+      // For TOKEN_REFRESHED with an existing cache hit, use cache instantly to
+      // avoid a visible spinner on every token refresh.
+      if (cache.userId === nextSession.user.id && cache.role) {
+        setRole(cache.role);
+        setProfile(cache.profile);
+      } else {
+        setLoading(true);
+      }
     }
 
     try {
